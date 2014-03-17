@@ -37,6 +37,8 @@ private:
 	std::string m_trashBoxName1;
 	std::string m_trashBoxName2;
 
+	std::string userName;
+
   double m_angularVelocity;  // rotation speed of the wheel
   double m_jointVelocity;    // rotation speed around the joint
   double m_radius;           // radius of the wheel
@@ -91,6 +93,10 @@ void DemoRobotController::onInit(InitEvent &evt) {
 
 	m_trashBoxName1 = "trashbox_0";  // for recycle
 	m_trashBoxName2 = "trashbox_1";  // for burnable
+
+	m_graspObjectName = m_trashName2;
+
+	userName = "man_000";
 
 	// set positions;
 	m_frontTrashBox1 = Vector3d(-80.0, 0.0, -90);  // for recycle material
@@ -582,11 +588,18 @@ void DemoRobotController::onCollision(CollisionEvent &evt) {
 			if(m_graspObjectName == with[i]){
 				//右手に衝突した場合
 				if(mparts[i] == "RARM_LINK7"){
+					sendMsg("man_000", "release");
+					//LOG_MSG(("release\n"));
+					sleep(1);
 					//自分を取得
 					SimObj *my = getObj(myname());
 					//自分の手のパーツを得ます
 					CParts * parts = my->getParts("RARM_LINK7");
-					if(parts->graspObj(with[i])) m_grasp = true;
+					if (parts->graspObj(with[i])){
+						
+						m_grasp = true;
+						
+					}
 				}
 			}
 		}

@@ -19,9 +19,10 @@ public:
 	void onInit(InitEvent &evt);
 	double onAction(ActionEvent &evt);
 	void onCollision(CollisionEvent &evt);
+	void throwTrash(void);
 
 private:
-
+	RobotObj *m_robotObject;
 	std::string m_graspObjectName;
 	std::string m_trashName1;
 	std::string m_trashName2;
@@ -55,6 +56,7 @@ private:
 
 void UserController::onInit(InitEvent &evt)
 {
+	m_robotObject = getRobotObj(myname());
 	robotName = "Robot";
 
 	m_trashName1 = "petbottle_1";
@@ -146,7 +148,7 @@ void UserController::onRecvMsg(RecvMsgEvent &evt)
 	strPos2 = ss.find(" ", strPos1);
 	headss.assign(ss, strPos1, strPos2-strPos1);
 
-
+	
 
 	if(headss == "HMD_DATA"){
 	//HMDデータによる頭部の動き反映
@@ -170,6 +172,10 @@ void UserController::onRecvMsg(RecvMsgEvent &evt)
 	sendMsg(robotName,"put");
 		LOG_MSG(("Putting the trash in the trash box"));
 	}
+	else if (ss == "release") {
+		this->throwTrash();
+		LOG_MSG(("User:release\n"));
+	}
 
 
 
@@ -177,6 +183,11 @@ void UserController::onRecvMsg(RecvMsgEvent &evt)
 
 	else if(ss == "init") {
 	sendMsg(robotName,"init");
+	}
+
+	else{
+		ss = "User:" + ss + "\n";
+		LOG_MSG((ss.c_str()));
 	}
 }
 
@@ -355,6 +366,20 @@ void UserController::onCollision(CollisionEvent &evt) {
 			}
 		}
 	}
+}
+
+void UserController::throwTrash(void){
+	// get the part info. 
+	CParts *parts = m_robotObject->getParts("RARM_LINK7");
+
+	// release grasping
+	parts->releaseObj();
+
+	// wait a bit
+	sleep(1);
+
+	// set the grasping flag to neutral
+	m_grasp = false;
 }
 
 extern "C" Controller * createController ()
