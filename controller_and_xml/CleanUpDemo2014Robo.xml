@@ -59,7 +59,7 @@
 
   </instanciate>
 
-  <instanciate class="seModerator.xml">
+  <!--<instanciate class="seModerator.xml">
     <set-attr-value name="name" value="moderator_0"/>
     <set-attr-value name="dynamics" value="false"/>
     <set-attr-value name="x" value="190.0"/>
@@ -70,7 +70,7 @@
                     value="./Moderator.so"/>
     <set-attr-value name="collision" value="false"/>
     <set-attr-value name="graspable" value="false"/>
-  </instanciate>
+  </instanciate>-->
 
 <!-- object -->
   <instanciate class="seCannedjuice_200ml_c01.xml">  
@@ -101,8 +101,8 @@
   </instanciate>  
 
 <!-- object list-->
-<!--
-  <instanciate class="sePetbottle_2l_half_c02.xml">
+
+  <!--<instanciate class="sePetbottle_2l_half_c02.xml">
     <set-attr-value name="name" value="petbottle_0"/>
     <set-attr-value name="dynamics" value="false"/>
     <set-attr-value name="x" value="0.0"/>
@@ -253,17 +253,17 @@
     <set-attr-value name="z" value="0.0"/>
     <set-attr-value name="collision" value="true"/>
     <set-attr-value name="graspable" value="true"/>
-  </instanciate>
+  </instanciate>-->
   <instanciate class="seKettle.xml">
     <set-attr-value name="name" value="kettle"/>
     <set-attr-value name="dynamics" value="false"/>
-    <set-attr-value name="x" value="0.0"/>
-    <set-attr-value name="y" value="0.0"/>
-    <set-attr-value name="z" value="0.0"/>
+    <set-attr-value name="x" value="313.0"/>
+    <set-attr-value name="y" value="68.0"/>
+    <set-attr-value name="z" value="-5.0"/>
     <set-attr-value name="collision" value="true"/>
     <set-attr-value name="graspable" value="true"/>
   </instanciate>
--->
+
 
 <!-- faniture -->
 	<instanciate class="A1_rug.xml">
@@ -282,7 +282,7 @@
     <set-attr-value name="y" value="25.0"/>
     <set-attr-value name="z" value="29.017"/>
     <set-attr-value name="graspable" value="false"/>
-		<set-attr-value name="collision" value="true"/>
+		<set-attr-value name="collision" value="false"/>
   </instanciate>
   <instanciate class="A1_sofas.xml">
     <set-attr-value name="name" value="Sofas1"/>

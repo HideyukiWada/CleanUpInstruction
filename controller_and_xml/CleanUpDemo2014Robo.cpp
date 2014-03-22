@@ -3,6 +3,7 @@
 #include "Logger.h"
 #include <unistd.h>
 #include <algorithm>
+#include <stdlib.h>
 
 //convert angle unit from degree to radian
 #define DEG2RAD(DEG) ( (M_PI) * (DEG) / 180.0 )
@@ -32,10 +33,16 @@ private:
 
 	std::string m_trashName1;
 	std::string m_trashName2;
+	std::string m_trashName3;
+	std::vector<std::string> trashNames;
+
 	std::string m_graspObjectName;
 
 	std::string m_trashBoxName1;
 	std::string m_trashBoxName2;
+	std::string m_trashBoxName3;
+	std::string m_trashBoxName4;
+	std::string trashBoxName;
 
 	std::string userName;
 
@@ -53,9 +60,13 @@ private:
 	//positions
 	Vector3d m_frontTrashBox1;
 	Vector3d m_frontTrashBox2;
+	Vector3d m_frontTrashBox3;
 	Vector3d m_relayPoint1;
 	Vector3d m_frontTrash1;
 	Vector3d m_frontTrash2;
+	Vector3d m_waitPosition;
+	Vector3d m_userPosition;
+	Vector3d frontTrashBox;
 
 	// condition flag for grasping trash
 	bool m_grasp;
@@ -80,7 +91,7 @@ void DemoRobotController::onInit(InitEvent &evt) {
 	m_time1 = 0.0;
 	m_time4 = 0.0;
 
-	m_state = 1;  // switch of initial behavior
+	m_state = 0;  // switch of initial behavior
 	refreshRateOnAction = 0.1;     // refresh-rate for onAction proc.
 
 	// angular velocity of wheel and moving speed of robot
@@ -92,20 +103,28 @@ void DemoRobotController::onInit(InitEvent &evt) {
 
 	m_trashName1 = "petbottle_1";
 	m_trashName2 = "can_0";
+	m_trashName3 = "kettle";
 
 	m_trashBoxName1 = "trashbox_0";  // for recycle
 	m_trashBoxName2 = "trashbox_1";  // for burnable
 
-	m_graspObjectName = m_trashName2;
+	trashNames.push_back(m_trashName1);
+	trashNames.push_back(m_trashName2);
+	trashNames.push_back(m_trashName3);
+
+	//m_graspObjectName = m_trashName2;
 
 	userName = "man_000";
 
 	// set positions;
-	m_frontTrashBox1 = Vector3d(-80.0, 0.0, -90);  // for recycle material
-	m_frontTrashBox2 = Vector3d(20.0, 0.0, -90);  // for burnable material
+	m_frontTrashBox1 = Vector3d(-50.0, 0.0, -90);  // for recycle material
+	m_frontTrashBox2 = Vector3d(50.0, 0.0, -90);  // for burnable material
+	m_frontTrashBox3 = Vector3d(150.0, 0.0, -90);
 	m_relayPoint1    = Vector3d(190.0, 0.0, -65.0);
-	m_frontTrash1     = Vector3d(273.0, 0.0, -65.0);
-	m_frontTrash2     = Vector3d(305.0, 0.0, -80.0);
+	m_frontTrash1    = Vector3d(273.0, 0.0, -65.0);
+	m_frontTrash2    = Vector3d(305.0, 0.0, -80.0);
+	m_waitPosition   = Vector3d(180.0, 30.0, -50.0);
+	m_userPosition   = Vector3d(280.0, 30.0, -50.0);
 
 	m_grasp = false;
 	m_release = false;
@@ -117,193 +136,229 @@ double DemoRobotController::onAction(ActionEvent &evt) {
 		case 0: {
 			break;
 		}
-		case 1: {
-			this->stopRobotMove();
-			break;
-		}
-		case 10: {  // go straight a bit
-			m_graspObjectName = m_trashName2;  // at first, focusing to m_trashName2:can_0
-			m_robotObject->setWheelVelocity(m_angularVelocity, m_angularVelocity);
-			m_time = 10.0/m_movingSpeed + evt.time();  // time to be elapsed
-			m_state = 20;
-			break;
-		}
-		case 20: {  // direct to the trash
-			if(evt.time() >= m_time && m_state==20){
-				stopRobotMove();    // at first, stop robot maneuver
+		//case 1: {
+		//	this->stopRobotMove();
+		//	break;
+		//}
+		//case 10: {  // go straight a bit
+		//	m_graspObjectName = m_trashName2;  // at first, focusing to m_trashName2:can_0
+		//	m_robotObject->setWheelVelocity(m_angularVelocity, m_angularVelocity);
+		//	m_time = 10.0/m_movingSpeed + evt.time();  // time to be elapsed
+		//	m_state = 20;
+		//	break;
+		//}
+		//case 20: {  // direct to the trash
+		//	if(evt.time() >= m_time && m_state==20){
+		//		stopRobotMove();    // at first, stop robot maneuver
 
-				Vector3d l_tpos;
-				this->recognizeObjectPosition(l_tpos, m_trashName2);  // get position of trash
-				double l_moveTime = rotateTowardObj(l_tpos);  // rotate toward the position and calculate the time to be elapsed.
+		//		Vector3d l_tpos;
+		//		this->recognizeObjectPosition(l_tpos, m_trashName2);  // get position of trash
+		//		double l_moveTime = rotateTowardObj(l_tpos);  // rotate toward the position and calculate the time to be elapsed.
 
-				m_time = l_moveTime+evt.time();
-				m_state = 30;
-			}
-			break;
-		}
-		case 30: {  // proceed toward trash
-			if(evt.time() >= m_time && m_state==30){
-				this->stopRobotMove();
+		//		m_time = l_moveTime+evt.time();
+		//		m_state = 30;
+		//	}
+		//	break;
+		//}
+		//case 30: {  // proceed toward trash
+		//	if(evt.time() >= m_time && m_state==30){
+		//		this->stopRobotMove();
 
-				Vector3d l_tpos;
-				this->recognizeObjectPosition(l_tpos, m_trashName2);
-				double l_moveTime = goToObj(l_tpos, 75.0);  // go toward the position and calculate the time to be elapsed.
+		//		Vector3d l_tpos;
+		//		this->recognizeObjectPosition(l_tpos, m_trashName2);
+		//		double l_moveTime = goToObj(l_tpos, 75.0);  // go toward the position and calculate the time to be elapsed.
 
-				m_time = l_moveTime+evt.time();
-				m_state = 40;
-      }
-      break;
-    }
-		case 40: {  // get back a bit after colliding with the table
-			if(evt.time() >= m_time && m_state==40){
-				this->stopRobotMove();    // at first, stop robot maneuver
+		//		m_time = l_moveTime+evt.time();
+		//		m_state = 40;
+  //    }
+  //    break;
+  //  }
+		//case 40: {  // get back a bit after colliding with the table
+		//	if(evt.time() >= m_time && m_state==40){
+		//		this->stopRobotMove();    // at first, stop robot maneuver
 
-				m_robotObject->setWheelVelocity(-m_angularVelocity, -m_angularVelocity);
-				m_time = 20./m_movingSpeed + evt.time();
-				m_state = 50;
-			}
-			break;
-		}
-		case 50: {  // detour: rotate toward relay point 1
-			if(evt.time() >= m_time && m_state==50){
-				this->stopRobotMove();
+		//		m_robotObject->setWheelVelocity(-m_angularVelocity, -m_angularVelocity);
+		//		m_time = 20./m_movingSpeed + evt.time();
+		//		m_state = 50;
+		//	}
+		//	break;
+		//}
+		//case 50: {  // detour: rotate toward relay point 1
+		//	if(evt.time() >= m_time && m_state==50){
+		//		this->stopRobotMove();
 
-				double l_moveTime = rotateTowardObj(m_relayPoint1);
+		//		double l_moveTime = rotateTowardObj(m_relayPoint1);
 
-				m_time = l_moveTime+evt.time();
-				m_state = 60;
-			}
-			break;
-		}
-		case 60: {  // detour: go toward relay point 1
-			if(evt.time() >= m_time && m_state==60){
-				this->stopRobotMove();
+		//		m_time = l_moveTime+evt.time();
+		//		m_state = 60;
+		//	}
+		//	break;
+		//}
+		//case 60: {  // detour: go toward relay point 1
+		//	if(evt.time() >= m_time && m_state==60){
+		//		this->stopRobotMove();
 
-				double l_moveTime = goToObj(m_relayPoint1, 0.0);
+		//		double l_moveTime = goToObj(m_relayPoint1, 0.0);
 
-				m_time = l_moveTime+evt.time();
-				m_state = 70;
-			}
-			break;
-		}
-		case 70: {  // rotate toward the position in front of trash
-			if(evt.time() >= m_time && m_state==70){
-				this->stopRobotMove();
+		//		m_time = l_moveTime+evt.time();
+		//		m_state = 70;
+		//	}
+		//	break;
+		//}
+		//case 70: {  // rotate toward the position in front of trash
+		//	if(evt.time() >= m_time && m_state==70){
+		//		this->stopRobotMove();
 
-				double l_moveTime = rotateTowardObj(m_frontTrash1);
+		//		double l_moveTime = rotateTowardObj(m_frontTrash1);
 
-				m_time = l_moveTime+evt.time();
-				m_state = 80;
-			}
-			break;
-		}
-		case 80: {  // go toward the position in front of trash
-			if(evt.time() >= m_time && m_state==80){
-				this->stopRobotMove();
+		//		m_time = l_moveTime+evt.time();
+		//		m_state = 80;
+		//	}
+		//	break;
+		//}
+		//case 80: {  // go toward the position in front of trash
+		//	if(evt.time() >= m_time && m_state==80){
+		//		this->stopRobotMove();
 
-				double l_moveTime = goToObj(m_frontTrash1, 0.0);
+		//		double l_moveTime = goToObj(m_frontTrash1, 0.0);
 
-				m_time = l_moveTime+evt.time();
-				m_state = 90;
-			}
-			break;
-		}
-		case 90: {  // rotate toward the trash
-			if(evt.time() >= m_time && m_state==90){
-				this->stopRobotMove();
+		//		m_time = l_moveTime+evt.time();
+		//		m_state = 90;
+		//	}
+		//	break;
+		//}
+		//case 90: {  // rotate toward the trash
+		//	if(evt.time() >= m_time && m_state==90){
+		//		this->stopRobotMove();
 
-				Vector3d l_tpos;
-				this->recognizeObjectPosition(l_tpos, m_trashName2);
-				double l_moveTime = rotateTowardObj(l_tpos);
+		//		Vector3d l_tpos;
+		//		this->recognizeObjectPosition(l_tpos, m_trashName2);
+		//		double l_moveTime = rotateTowardObj(l_tpos);
 
-				m_time = l_moveTime+evt.time();
-				m_state = 100;
-			}
-			break;
-		}
-		case 100: {  // prepare the robot arm to grasping the trash
-			if(evt.time() >= m_time && m_state==100){
-				this->stopRobotMove();
+		//		m_time = l_moveTime+evt.time();
+		//		m_state = 100;
+		//	}
+		//	break;
+		//}
+		//case 100: {  // prepare the robot arm to grasping the trash
+		//	if(evt.time() >= m_time && m_state==100){
+		//		this->stopRobotMove();
+		//		this->neutralizeArms(evt.time());
+
+		//		m_state = 105;
+		//	}
+		//	break;
+		//}
+		//case 105: {  // fix robot direction for grasping
+		//	if(evt.time() >= m_time1 && m_state==105) m_robotObject->setJointVelocity("RARM_JOINT1", 0.0, 0.0);
+		//	if(evt.time() >= m_time4 && m_state==105) m_robotObject->setJointVelocity("RARM_JOINT4", 0.0, 0.0);
+		//	if(evt.time() >= m_time1 && evt.time() >= m_time4 && m_state==105){
+		//		Vector3d l_tpos;
+		//		this->recognizeObjectPosition(l_tpos, m_trashName2);
+		//		double l_moveTime = rotateTowardObj(l_tpos);
+
+		//		m_time = l_moveTime+evt.time();
+
+		//		m_state = 110;
+		//	}
+		//	break;
+		//}
+		//case 110: {  // approach to the trash
+		//	if(evt.time() >= m_time && m_state==110){
+		//		this->stopRobotMove();
+
+		//		Vector3d l_tpos;
+		//		this->recognizeObjectPosition(l_tpos, m_trashName2);
+		//		double l_moveTime = goToObj(l_tpos, 30.0);
+		//		m_time = l_moveTime+evt.time();
+
+		//		m_state = 120;
+		//	}
+		//	break;
+		//}
+		//case 120: {  // try to grasp trash
+		//	if(evt.time() >= m_time && m_state==120){
+		//		this->stopRobotMove();
+		//		Vector3d l_tpos;
+		//		this->recognizeObjectPosition(l_tpos, m_trashName2);
+		//		double l_moveTime = goGraspingObject(l_tpos);
+		//		m_time = l_moveTime+evt.time();
+
+		//		m_state = 125;
+		//	}
+		//	break;
+		//}
+		//case 125: {
+		//	if(evt.time() >= m_time && m_state==125) {
+		//		m_robotObject->setJointVelocity("RARM_JOINT4", 0.0, 0.0);
+		//		this->neutralizeArms(evt.time());
+
+		//		m_state = 130;
+		//	}
+		//	break;
+		//}
+		//case 130: {
+		//	if(evt.time() >= m_time1 && m_state==130) m_robotObject->setJointVelocity("RARM_JOINT1", 0.0, 0.0);
+		//	if(evt.time() >= m_time4 && m_state==130) m_robotObject->setJointVelocity("RARM_JOINT4", 0.0, 0.0);
+		//	if(evt.time() >= m_time1 && evt.time() >= m_time4 && m_state==130){
+
+		//		m_robotObject->setWheelVelocity(-m_angularVelocity, -m_angularVelocity);
+		//		m_time = 20./m_movingSpeed + evt.time();
+
+		//		m_state = 150;
+		//	}
+		//	break;
+		//}
+		case 140: {
 				this->neutralizeArms(evt.time());
-
-				m_state = 105;
-			}
-			break;
+				m_state = 141;
+				sendMsg("VoiceReco_Service", "start");
+				break;
 		}
-		case 105: {  // fix robot direction for grasping
-			if(evt.time() >= m_time1 && m_state==105) m_robotObject->setJointVelocity("RARM_JOINT1", 0.0, 0.0);
-			if(evt.time() >= m_time4 && m_state==105) m_robotObject->setJointVelocity("RARM_JOINT4", 0.0, 0.0);
-			if(evt.time() >= m_time1 && evt.time() >= m_time4 && m_state==105){
-				Vector3d l_tpos;
-				this->recognizeObjectPosition(l_tpos, m_trashName2);
-				double l_moveTime = rotateTowardObj(l_tpos);
-
-				m_time = l_moveTime+evt.time();
-
-				m_state = 110;
-			}
-			break;
+		case 141: {
+				if (evt.time() >= m_time1 && m_state == 141) m_robotObject->setJointVelocity("RARM_JOINT1", 0.0, 0.0);
+				if (evt.time() >= m_time4 && m_state == 141) m_robotObject->setJointVelocity("RARM_JOINT4", 0.0, 0.0);
+				if (evt.time() >= m_time1 && evt.time() >= m_time4 && m_state == 141){
+					this->stopRobotMove();
+					sendMsg("VoiceReco_Service", "please pass my hand");
+					m_state = 142;
+				}
+				break;
 		}
-		case 110: {  // approach to the trash
-			if(evt.time() >= m_time && m_state==110){
-				this->stopRobotMove();
-
-				Vector3d l_tpos;
-				this->recognizeObjectPosition(l_tpos, m_trashName2);
-				double l_moveTime = goToObj(l_tpos, 30.0);
-				m_time = l_moveTime+evt.time();
-
-				m_state = 120;
-			}
-			break;
+		//発話対機状態
+		case 142: {
+				break;
 		}
-		case 120: {  // try to grasp trash
-			if(evt.time() >= m_time && m_state==120){
-				this->stopRobotMove();
-				Vector3d l_tpos;
-				this->recognizeObjectPosition(l_tpos, m_trashName2);
-				double l_moveTime = goGraspingObject(l_tpos);
-				m_time = l_moveTime+evt.time();
-
-				m_state = 125;
-			}
-			break;
-		}
-		case 125: {
-			if(evt.time() >= m_time && m_state==125) {
-				m_robotObject->setJointVelocity("RARM_JOINT4", 0.0, 0.0);
-				this->neutralizeArms(evt.time());
-
-				m_state = 130;
-			}
-			break;
-		}
-		case 130: {
-			if(evt.time() >= m_time1 && m_state==130) m_robotObject->setJointVelocity("RARM_JOINT1", 0.0, 0.0);
-			if(evt.time() >= m_time4 && m_state==130) m_robotObject->setJointVelocity("RARM_JOINT4", 0.0, 0.0);
-			if(evt.time() >= m_time1 && evt.time() >= m_time4 && m_state==130){
-
-				m_robotObject->setWheelVelocity(-m_angularVelocity, -m_angularVelocity);
-				m_time = 20./m_movingSpeed + evt.time();
-
-				m_state = 150;
-			}
-			break;
-		}
-		case 150: {
-			if(evt.time() >= m_time && m_state==150){
-				this->stopRobotMove();
-				double l_moveTime = rotateTowardObj(m_frontTrashBox2);
+		case 143: {
+				double l_moveTime = rotateTowardObj(Vector3d(10.0, 0.0, -90));
 
 				m_time = l_moveTime + evt.time();
-				m_state = 160;
-			}
+				m_state = 144;
+				break;
+		}
+		case 144: {
+				if (evt.time() >= m_time && m_state == 144){
+					this->stopRobotMove();
+					sendMsg("VoiceReco_Service", "please choose the trashbox");
+					m_state = 145;
+				}
+				break;
+		}
+		//発話対機状態
+		case 145: {
+				break;
+		}
+		case 150: {
+			double l_moveTime = rotateTowardObj(frontTrashBox);
+
+			m_time = l_moveTime + evt.time();
+			m_state = 160;
 			break;
 		}
 		case 160: {
 			if(evt.time() >= m_time && m_state==160){
 				this->stopRobotMove();
-				double l_moveTime = goToObj(m_frontTrashBox2,0.0);
+				double l_moveTime = goToObj(frontTrashBox,0.0);
 				m_time = l_moveTime + evt.time();
 				m_state = 161;
 			}
@@ -322,9 +377,9 @@ double DemoRobotController::onAction(ActionEvent &evt) {
 			if(evt.time() >= m_time1 && m_state==165) m_robotObject->setJointVelocity("RARM_JOINT1", 0.0, 0.0);
 			if(evt.time() >= m_time4 && m_state==165) m_robotObject->setJointVelocity("RARM_JOINT4", 0.0, 0.0);
 			if(evt.time() >= m_time1 && evt.time() >= m_time4 && m_state==165){
-
+				this->stopRobotMove();
 				Vector3d l_tpos;
-				this->recognizeObjectPosition(l_tpos, m_trashBoxName2);
+				this->recognizeObjectPosition(l_tpos, trashBoxName);
 				double l_moveTime = rotateTowardObj(l_tpos);
 				m_time = l_moveTime + evt.time();
 
@@ -337,7 +392,7 @@ double DemoRobotController::onAction(ActionEvent &evt) {
 
 				this->stopRobotMove();
 				Vector3d l_tpos;
-				this->recognizeObjectPosition(l_tpos, m_trashBoxName2);
+				this->recognizeObjectPosition(l_tpos, trashBoxName);
 				double l_moveTime = goToObj(l_tpos, 50.0);
 				m_time = l_moveTime + evt.time();
 
@@ -349,7 +404,7 @@ double DemoRobotController::onAction(ActionEvent &evt) {
 			if(evt.time() >= m_time && m_state==180){
 				this->stopRobotMove();
 				Vector3d l_tpos;
-				this->recognizeObjectPosition(l_tpos, m_trashBoxName2);
+				this->recognizeObjectPosition(l_tpos, trashBoxName);
 				double l_moveTime = rotateTowardObj(l_tpos);
 				m_time = l_moveTime + evt.time();
 
@@ -365,7 +420,7 @@ double DemoRobotController::onAction(ActionEvent &evt) {
 				sleep(1);
 
 				m_robotObject->setWheelVelocity(-m_angularVelocity, -m_angularVelocity);
-				m_time = 50.0/m_movingSpeed + evt.time();
+				m_time = 80.0/m_movingSpeed + evt.time();
 
 				m_state = 225;
 			}
@@ -376,198 +431,245 @@ double DemoRobotController::onAction(ActionEvent &evt) {
 				this->stopRobotMove();
 				this->neutralizeArms(evt.time());
 
-				m_state = 240;
+				m_state = 230;
+			}
+			break;
+		}
+		case 230: {
+			if (evt.time() >= m_time1 && m_state == 230) m_robotObject->setJointVelocity("RARM_JOINT1", 0.0, 0.0);
+			if (evt.time() >= m_time4 && m_state == 230) m_robotObject->setJointVelocity("RARM_JOINT4", 0.0, 0.0);
+			if (evt.time() >= m_time1 && evt.time() >= m_time4 && m_state == 230){
+				double l_moveTime = rotateTowardObj(m_waitPosition);
+
+				m_time = l_moveTime + evt.time();
+				m_state = 231;
+			}
+			break;
+		}
+		case 231: {
+			if (evt.time() >= m_time && m_state == 231){
+				this->stopRobotMove();
+				double l_moveTime = goToObj(m_waitPosition, 0.0);
+				m_time = l_moveTime + evt.time();
+				m_state = 232;
+			}
+			break;
+		}
+		case 232: {
+			if (evt.time() >= m_time && m_state == 232){
+				double l_moveTime = rotateTowardObj(m_userPosition);
+
+				m_time = l_moveTime + evt.time();
+				m_state = 233;
+			}
+			break;
+		}
+		case 233: {
+			if (evt.time() >= m_time && m_state == 233){
+				this->stopRobotMove();
+				this->neutralizeArms(evt.time());
+
+				m_state = 141;
+			}
+			break;
+		}
+		case 234: {
+			if (evt.time() >= m_time1 && m_state == 234) m_robotObject->setJointVelocity("RARM_JOINT1", 0.0, 0.0);
+			if (evt.time() >= m_time4 && m_state == 234) m_robotObject->setJointVelocity("RARM_JOINT4", 0.0, 0.0);
+			if (evt.time() >= m_time1 && evt.time() >= m_time4 && m_state == 234){
+				this->stopRobotMove();
+				m_state = 141;
 			}
 			break;
 		}
 //********************************************************************
-		case 240: {  // go next
-			if(evt.time() >= m_time1 && m_state==240) m_robotObject->setJointVelocity("RARM_JOINT1", 0.0, 0.0);
-			if(evt.time() >= m_time4 && m_state==240) m_robotObject->setJointVelocity("RARM_JOINT4", 0.0, 0.0);
-			if(evt.time() >= m_time1 && evt.time() >= m_time4 && m_state==240){
-				this->stopRobotMove();
+		//case 240: {  // go next
+		//	if(evt.time() >= m_time1 && m_state==240) m_robotObject->setJointVelocity("RARM_JOINT1", 0.0, 0.0);
+		//	if(evt.time() >= m_time4 && m_state==240) m_robotObject->setJointVelocity("RARM_JOINT4", 0.0, 0.0);
+		//	if(evt.time() >= m_time1 && evt.time() >= m_time4 && m_state==240){
+		//		this->stopRobotMove();
 
-				m_graspObjectName = m_trashName1;  // set next target
+		//		m_graspObjectName = m_trashName1;  // set next target
 
-				double l_moveTime = rotateTowardObj(m_frontTrash2);
-				m_time = l_moveTime + evt.time();
+		//		double l_moveTime = rotateTowardObj(m_frontTrash2);
+		//		m_time = l_moveTime + evt.time();
 
-				m_state = 250;
-			}
-			break;
-		}
-		case 250: {  // approach to neighbor of next target
-			if(evt.time() >= m_time && m_state==250){
-				this->stopRobotMove();
+		//		m_state = 250;
+		//	}
+		//	break;
+		//}
+		//case 250: {  // approach to neighbor of next target
+		//	if(evt.time() >= m_time && m_state==250){
+		//		this->stopRobotMove();
 
-				double l_moveTime = goToObj(m_frontTrash2, 0.0);
-				m_time = l_moveTime + evt.time();
+		//		double l_moveTime = goToObj(m_frontTrash2, 0.0);
+		//		m_time = l_moveTime + evt.time();
 
-				m_state = 260;
-			}
-			break;
-		}
-		case 260: {
-			if(evt.time() >= m_time && m_state==260){
-				this->stopRobotMove();
-				Vector3d l_tpos;
-				this->recognizeObjectPosition(l_tpos, m_trashName1);
-				double l_moveTime = rotateTowardObj(l_tpos);
-				m_time = l_moveTime+evt.time();
+		//		m_state = 260;
+		//	}
+		//	break;
+		//}
+		//case 260: {
+		//	if(evt.time() >= m_time && m_state==260){
+		//		this->stopRobotMove();
+		//		Vector3d l_tpos;
+		//		this->recognizeObjectPosition(l_tpos, m_trashName1);
+		//		double l_moveTime = rotateTowardObj(l_tpos);
+		//		m_time = l_moveTime+evt.time();
 
-				m_state = 270;
-			}
-			break;
-		}
-		case 270: {  // approach to next target
-			if(evt.time() >= m_time && m_state==270){
-				this->stopRobotMove();
+		//		m_state = 270;
+		//	}
+		//	break;
+		//}
+		//case 270: {  // approach to next target
+		//	if(evt.time() >= m_time && m_state==270){
+		//		this->stopRobotMove();
 
-				Vector3d l_tpos;
-				this->recognizeObjectPosition(l_tpos, m_trashName1);
-				double l_moveTime = goToObj(l_tpos, 39.0);
-				m_time = l_moveTime + evt.time();
+		//		Vector3d l_tpos;
+		//		this->recognizeObjectPosition(l_tpos, m_trashName1);
+		//		double l_moveTime = goToObj(l_tpos, 39.0);
+		//		m_time = l_moveTime + evt.time();
 
-				m_state = 275;
-			}
-			break;
-		}
-		case 275: {
-			if(evt.time() >= m_time && m_state==275){
-				this->stopRobotMove();
-				Vector3d l_tpos;
-				this->recognizeObjectPosition(l_tpos, m_trashName1);
-				double l_moveTime = rotateTowardObj(l_tpos);
-				m_time = l_moveTime+evt.time();
+		//		m_state = 275;
+		//	}
+		//	break;
+		//}
+		//case 275: {
+		//	if(evt.time() >= m_time && m_state==275){
+		//		this->stopRobotMove();
+		//		Vector3d l_tpos;
+		//		this->recognizeObjectPosition(l_tpos, m_trashName1);
+		//		double l_moveTime = rotateTowardObj(l_tpos);
+		//		m_time = l_moveTime+evt.time();
 
-				m_state = 280;
-			}
-			break;
-		}
-		case 280: {
-			if(evt.time() >= m_time && m_state==280){
-				this->stopRobotMove();
+		//		m_state = 280;
+		//	}
+		//	break;
+		//}
+		//case 280: {
+		//	if(evt.time() >= m_time && m_state==280){
+		//		this->stopRobotMove();
 
-				Vector3d l_tpos;
-				this->recognizeObjectPosition(l_tpos, m_trashName1);
-				double l_moveTime = goGraspingObject(l_tpos);
-				m_time = l_moveTime+evt.time();
+		//		Vector3d l_tpos;
+		//		this->recognizeObjectPosition(l_tpos, m_trashName1);
+		//		double l_moveTime = goGraspingObject(l_tpos);
+		//		m_time = l_moveTime+evt.time();
 
-				m_state = 290;
-			}
-			break;
-		}
-		case 290: {
-			if(evt.time() >= m_time && m_state==290) {
-				m_robotObject->setJointVelocity("RARM_JOINT4", 0.0, 0.0);
-				this->neutralizeArms(evt.time());
+		//		m_state = 290;
+		//	}
+		//	break;
+		//}
+		//case 290: {
+		//	if(evt.time() >= m_time && m_state==290) {
+		//		m_robotObject->setJointVelocity("RARM_JOINT4", 0.0, 0.0);
+		//		this->neutralizeArms(evt.time());
 
-				m_state = 300;
-			}
-			break;
-		}
-		case 300: {
-			if(evt.time() >= m_time1 && m_state==300) m_robotObject->setJointVelocity("RARM_JOINT1", 0.0, 0.0);
-			if(evt.time() >= m_time4 && m_state==300) m_robotObject->setJointVelocity("RARM_JOINT4", 0.0, 0.0);
-			if(evt.time() >= m_time1 && evt.time() >= m_time4 && m_state==300){
+		//		m_state = 300;
+		//	}
+		//	break;
+		//}
+		//case 300: {
+		//	if(evt.time() >= m_time1 && m_state==300) m_robotObject->setJointVelocity("RARM_JOINT1", 0.0, 0.0);
+		//	if(evt.time() >= m_time4 && m_state==300) m_robotObject->setJointVelocity("RARM_JOINT4", 0.0, 0.0);
+		//	if(evt.time() >= m_time1 && evt.time() >= m_time4 && m_state==300){
 
-				m_robotObject->setWheelVelocity(-m_angularVelocity, -m_angularVelocity);
-				m_time = 20./m_movingSpeed + evt.time();
+		//		m_robotObject->setWheelVelocity(-m_angularVelocity, -m_angularVelocity);
+		//		m_time = 20./m_movingSpeed + evt.time();
 
-				m_state = 310;
-			}
-			break;
-		}
-		case 310: {
-			if(evt.time() >= m_time && m_state==310){
-				this->stopRobotMove();
-				double l_moveTime = rotateTowardObj(m_frontTrashBox1);
+		//		m_state = 310;
+		//	}
+		//	break;
+		//}
+		//case 310: {
+		//	if(evt.time() >= m_time && m_state==310){
+		//		this->stopRobotMove();
+		//		double l_moveTime = rotateTowardObj(m_frontTrashBox1);
 
-				m_time = l_moveTime + evt.time();
-				m_state = 320;
-			}
-			break;
-		}
-		case 320: {
-			if(evt.time() >= m_time && m_state==320){
-				this->stopRobotMove();
-				double l_moveTime = goToObj(m_frontTrashBox1,0.0);
-				m_time = l_moveTime + evt.time();
+		//		m_time = l_moveTime + evt.time();
+		//		m_state = 320;
+		//	}
+		//	break;
+		//}
+		//case 320: {
+		//	if(evt.time() >= m_time && m_state==320){
+		//		this->stopRobotMove();
+		//		double l_moveTime = goToObj(m_frontTrashBox1,0.0);
+		//		m_time = l_moveTime + evt.time();
 
-				m_state = 340;
-			}
-			break;
-		}
-		case 340: {
-			if(evt.time() >= m_time && m_state==340){
-				this->stopRobotMove();
-				this->prepareThrowing(evt.time());
+		//		m_state = 340;
+		//	}
+		//	break;
+		//}
+		//case 340: {
+		//	if(evt.time() >= m_time && m_state==340){
+		//		this->stopRobotMove();
+		//		this->prepareThrowing(evt.time());
 
-				m_state = 350;
-			}
-			break;
-		}
-		case 350: {
-			if(evt.time() >= m_time1 && m_state==350) m_robotObject->setJointVelocity("RARM_JOINT1", 0.0, 0.0);
-			if(evt.time() >= m_time4 && m_state==350) m_robotObject->setJointVelocity("RARM_JOINT4", 0.0, 0.0);
-			if(evt.time() >= m_time1 && evt.time() >= m_time4 && m_state==350){
+		//		m_state = 350;
+		//	}
+		//	break;
+		//}
+		//case 350: {
+		//	if(evt.time() >= m_time1 && m_state==350) m_robotObject->setJointVelocity("RARM_JOINT1", 0.0, 0.0);
+		//	if(evt.time() >= m_time4 && m_state==350) m_robotObject->setJointVelocity("RARM_JOINT4", 0.0, 0.0);
+		//	if(evt.time() >= m_time1 && evt.time() >= m_time4 && m_state==350){
 
-				Vector3d l_tpos;
-				this->recognizeObjectPosition(l_tpos, m_trashBoxName1);
-				double l_moveTime = rotateTowardObj(l_tpos);
-				m_time = l_moveTime + evt.time();
+		//		Vector3d l_tpos;
+		//		this->recognizeObjectPosition(l_tpos, m_trashBoxName1);
+		//		double l_moveTime = rotateTowardObj(l_tpos);
+		//		m_time = l_moveTime + evt.time();
 
-				m_state = 360;
-			}
-			break;
-		}
-		case 360: {
-			if(evt.time() >= m_time && m_state==360){
+		//		m_state = 360;
+		//	}
+		//	break;
+		//}
+		//case 360: {
+		//	if(evt.time() >= m_time && m_state==360){
 
-				this->stopRobotMove();
-				Vector3d l_tpos;
-				this->recognizeObjectPosition(l_tpos, m_trashBoxName1);
-				double l_moveTime = goToObj(l_tpos, 50.0);
-				m_time = l_moveTime + evt.time();
+		//		this->stopRobotMove();
+		//		Vector3d l_tpos;
+		//		this->recognizeObjectPosition(l_tpos, m_trashBoxName1);
+		//		double l_moveTime = goToObj(l_tpos, 50.0);
+		//		m_time = l_moveTime + evt.time();
 
-				m_state = 370;
-			}
-			break;
-		}
-		case 370: {
-			if(evt.time() >= m_time && m_state==370){
-				this->stopRobotMove();
-				Vector3d l_tpos;
-				this->recognizeObjectPosition(l_tpos, m_trashBoxName1);
-				double l_moveTime = rotateTowardObj(l_tpos);
-				m_time = l_moveTime + evt.time();
+		//		m_state = 370;
+		//	}
+		//	break;
+		//}
+		//case 370: {
+		//	if(evt.time() >= m_time && m_state==370){
+		//		this->stopRobotMove();
+		//		Vector3d l_tpos;
+		//		this->recognizeObjectPosition(l_tpos, m_trashBoxName1);
+		//		double l_moveTime = rotateTowardObj(l_tpos);
+		//		m_time = l_moveTime + evt.time();
 
-				m_state = 380;
-			}
-			break;
-		}
-		case 380: {  // throw trash and get back a bit
-			if(evt.time() >= m_time && m_state==380){
-				this->stopRobotMove();
-				this->throwTrash();
+		//		m_state = 380;
+		//	}
+		//	break;
+		//}
+		//case 380: {  // throw trash and get back a bit
+		//	if(evt.time() >= m_time && m_state==380){
+		//		this->stopRobotMove();
+		//		this->throwTrash();
 
-				sleep(1);
+		//		sleep(1);
 
-				m_robotObject->setWheelVelocity(-m_angularVelocity, -m_angularVelocity);
-				m_time = 50.0/m_movingSpeed + evt.time();
+		//		m_robotObject->setWheelVelocity(-m_angularVelocity, -m_angularVelocity);
+		//		m_time = 50.0/m_movingSpeed + evt.time();
 
-				m_state = 390;
-			}
-			break;
-		}
-		case 390: {  // recover robot arms
-			if(evt.time() >= m_time && m_state==390){
-				this->stopRobotMove();
+		//		m_state = 390;
+		//	}
+		//	break;
+		//}
+		//case 390: {  // recover robot arms
+		//	if(evt.time() >= m_time && m_state==390){
+		//		this->stopRobotMove();
 
-				m_state = 0;
-			}
-			break;
-		}
+		//		m_state = 0;
+		//	}
+		//	break;
+		//}
 	}
 
 	return refreshRateOnAction;
@@ -599,9 +701,48 @@ void DemoRobotController::onRecvMsg(RecvMsgEvent &evt) {
 		CParts * parts = my->getParts("RARM_LINK7");
 		LOG_MSG((tmpss.c_str()));
 		if (parts->graspObj(tmpss)){
+			sendMsg("VoiceReco_Service", tmpss);
 			m_grasp = true;
+			m_state = 143;
 		}
-
+	}
+	else if (m_state == 0){
+		if (ss == "go"){
+			m_state = 140;
+		}
+		else sendMsg("VoiceReco_Service", "Message is not accepted");
+	}
+	else if (m_state == 145){
+		if (ss == "trashbox_0"){
+			sendMsg("VoiceReco_Service", ss);
+			trashBoxName = ss;
+			frontTrashBox = m_frontTrashBox1;
+			m_state = 150;
+		}
+		else if (ss == "trashbox_1"){
+			sendMsg("VoiceReco_Service", ss);
+			trashBoxName = ss;
+			frontTrashBox = m_frontTrashBox2;
+			m_state = 150;
+		}
+		else if (ss == "trashbox_2"){
+			sendMsg("VoiceReco_Service", ss);
+			trashBoxName = ss;
+			frontTrashBox = m_frontTrashBox3;
+			m_state = 150;
+		}
+		else if (ss == "wagon_0"){
+			sendMsg("VoiceReco_Service", ss);
+			trashBoxName = ss;
+			frontTrashBox = m_frontTrashBox3;
+			m_state = 150;
+		}
+		else sendMsg("VoiceReco_Service", "Message is not accepted");
+	}
+	else if (ss == "finish"){
+		sendMsg("VoiceReco_Service", ss);
+		disconnectToService("VoiceReco_Service");
+		disconnectToService("SIGKINECT");
 	}
 }
 
@@ -616,11 +757,14 @@ void DemoRobotController::onCollision(CollisionEvent &evt) {
 
 		//　衝突したエンティティでループします
 		for(int i = 0; i < with.size(); i++){
-			if(m_graspObjectName == with[i]){
-				//右手に衝突した場合
-				if(mparts[i] == "RARM_LINK7"){
-					sendMsg("man_000", "release");
-					m_release = true;
+			for (int j = 0; j < trashNames.size(); j++){
+				if (trashNames[j] == with[i]){
+					//右手に衝突した場合
+					if (mparts[i] == "RARM_LINK7"){
+						sendMsg("man_000", "release");
+						m_release = true;
+						m_graspObjectName = trashNames[j];
+					}
 				}
 			}
 		}
@@ -737,7 +881,7 @@ void DemoRobotController::prepareThrowing(double evt_time){
 	m_robotObject->setJointVelocity("RARM_JOINT1", -m_jointVelocity, 0.0);
 	m_time1 = DEG2RAD(abs(thetaJoint1))/ m_jointVelocity + evt_time;
 
-	double thetaJoint4 = 65.0;
+	double thetaJoint4 = 20.0;
 	m_robotObject->setJointVelocity("RARM_JOINT4", m_jointVelocity, 0.0);
 	m_time4 = DEG2RAD(abs(thetaJoint4))/ m_jointVelocity + evt_time;
 
@@ -756,6 +900,7 @@ void DemoRobotController::throwTrash(void){
 
 	// set the grasping flag to neutral
 	m_grasp = false;
+	m_release = false;
 }
 
 
