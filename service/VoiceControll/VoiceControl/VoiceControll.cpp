@@ -104,21 +104,24 @@ std::string VoiceRecognition::japaneseMessage2englishMessage(std::string japanes
 	std::string en_str;
 
 	//クリーンナップ開始
-	if (ja_str == "片づけて") en_str = "go";
+	if (ja_str == "片づけます") en_str = "go";
 
 	//把持対象の指定
-	else if (ja_str == "それを取って") en_str = "take";
-	else if (ja_str == "これをとって") en_str = "take";
+	else if (ja_str == "緑色のゴミ箱") en_str = "trashbox_0";
+	//else if (ja_str == "これをとって") en_str = "take";
 
 	//捨てるor置く対象の指定
-	else if (ja_str == "それに捨てて") en_str = "put";
-	else if (ja_str == "これに捨てて") en_str = "put";
-	else if (ja_str == "そこに捨てて") en_str = "put";
-	else if (ja_str == "そこに置いて") en_str = "put";
-	else if (ja_str == "ここにおいて") en_str = "put";
+	else if (ja_str == "赤色のゴミ箱") en_str = "trashbox_1";
+	//else if (ja_str == "これに捨てて") en_str = "put";
+	//else if (ja_str == "そこに捨てて") en_str = "put";
+	
+	else if (ja_str == "青色のゴミ箱") en_str = "trashbox_2";
+	//else if (ja_str == "ここにおいて") en_str = "put";
+
+	else if (ja_str == "茶色のワゴン") en_str = "wagon_0";
 
 	//捨てるor置く対象を間違った場合やり直す
-	else if (ja_str == "やり直し") en_str = "back";	
+	else if (ja_str == "終わります") en_str = "finish";	
 
 	//特定の命令以外の場合
 	else en_str = "error";
@@ -133,36 +136,40 @@ std::string VoiceRecognition::englishMessage2japaneseMessage(std::string english
 	std::string en_str = englishMessage;
 	std::string ja_str;
 
-	if (en_str == "Let's start the clean up task\n")
+	if (en_str == "start")
 	{
-		ja_str = "それではクリーンナップを始めます";
+		ja_str = "それでは片づけを始めます";
 	}
-	else if (en_str == "Please show me which object to take")
+	else if (en_str == "please pass my hand")
 	{
-		ja_str = "どの物体を取れば良いか教えてください";
+		ja_str = "片付けたい物体を右手に渡してください";
 	}
 	else if (en_str == "Message is not accepted")
 	{
 		ja_str = "聞き取れません。";
 	}
-	else if (en_str == "petbottle_4") 
+	else if (en_str == "please choose the trashbox")
+	{
+		ja_str = "持っていく先を教えてください";
+	}
+	else if (en_str == "petbottle_1") 
 	{
 		m_pointedObject = "ペットボトル";
-		ja_str = "分かりました" + m_pointedObject + "を取ります";
+		ja_str = m_pointedObject + "を捨てます";
 	}
-	else if (en_str == "mugcup") 
+	else if (en_str == "kettle") 
 	{
-		m_pointedObject = "マグカップ";
-		ja_str = "分かりました" + m_pointedObject + "を取ります";
+		m_pointedObject = "ケトル";
+		ja_str = m_pointedObject + "を取ります";
 	}
-	else if (en_str == "can_2")
+	else if (en_str == "can_0")
 	{
 		m_pointedObject = "缶";
-		ja_str = "分かりました" + m_pointedObject + "を取ります";
+		ja_str = "、" +m_pointedObject + "を捨てます";
 	}
-	else if (en_str == "Now I will go to the trash boxes")
+	else if (en_str == "finish")
 	{
-		ja_str = m_pointedObject + "を運びます";
+		ja_str = "綺麗に片付きました";
 	}
 	else if (en_str == "Please show me which trash box to use")
 	{
@@ -183,7 +190,7 @@ std::string VoiceRecognition::englishMessage2japaneseMessage(std::string english
 		m_pointedtrash = "瓶・缶";
 		ja_str = "分かりました、" + m_pointedObject + "を、" + m_pointedtrash + "、に捨てに行きます";
 	}
-	else if (en_str == "wagon")
+	else if (en_str == "wagon_0")
 	{
 		m_pointedtrash = "ワゴン";
 		ja_str = "分かりました、" + m_pointedObject + "を、" + m_pointedtrash + "、に置きに行きます";
@@ -193,13 +200,13 @@ std::string VoiceRecognition::englishMessage2japaneseMessage(std::string english
 
 
 void VoiceRecognition::onInit(){
-	robotName = "Robot";
+	robotName = "robot_000";
 
 	ShellExecute(NULL, "open", "juliusbat\\julius-run.bat", NULL, NULL, SW_SHOW);
 
-	std::ifstream ifs("juliusbat\\sentence.txt");
-	ifs.clear(); //前回文字列削除
-	ifs.close();
+	std::ofstream ofs("juliusbat\\sentence.txt");
+	ofs.clear(); //前回文字列削除
+	ofs.close();
 
 	Enable = true;
 	preview_string = "";
