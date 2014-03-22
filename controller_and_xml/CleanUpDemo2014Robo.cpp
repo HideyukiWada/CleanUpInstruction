@@ -60,6 +60,8 @@ private:
 	// condition flag for grasping trash
 	bool m_grasp;
 
+	bool m_release;
+
   // angular parameter used to put robot's hands down
   double thetaA;
 };
@@ -106,6 +108,7 @@ void DemoRobotController::onInit(InitEvent &evt) {
 	m_frontTrash2     = Vector3d(305.0, 0.0, -80.0);
 
 	m_grasp = false;
+	m_release = false;
 }
 
 
@@ -572,11 +575,39 @@ double DemoRobotController::onAction(ActionEvent &evt) {
 
 
 void DemoRobotController::onRecvMsg(RecvMsgEvent &evt) {
+	std::string sender = evt.getSender();
+
+
+	//メッセージ取得
+	char *all_msg = (char*)evt.getMsg();
+
+	std::string ss = all_msg;
+	//ヘッダーの取り出し
+	int strPos1 = 0;
+	int strPos2;
+
+	std::string headss;
+	std::string tmpss;
+	strPos2 = ss.find(" ", strPos1);
+	headss.assign(ss, strPos1, strPos2 - strPos1);
+	tmpss.assign(ss, strPos2 + 1, ss.length() - strPos2);
+
+	if (!m_grasp && headss == "release"){
+		//自分自身の取得
+		SimObj *my = getObj(myname());
+		//自分の手のパーツを得ます
+		CParts * parts = my->getParts("RARM_LINK7");
+		LOG_MSG((tmpss.c_str()));
+		if (parts->graspObj(tmpss)){
+			m_grasp = true;
+		}
+
+	}
 }
 
 
 void DemoRobotController::onCollision(CollisionEvent &evt) {
-	if (m_grasp == false){
+	if (m_grasp == false && m_release == false){
 		typedef CollisionEvent::WithC C;
 		//触れたエンティティの名前を得ます
 		const std::vector<std::string> & with = evt.getWith();
@@ -589,17 +620,7 @@ void DemoRobotController::onCollision(CollisionEvent &evt) {
 				//右手に衝突した場合
 				if(mparts[i] == "RARM_LINK7"){
 					sendMsg("man_000", "release");
-					//LOG_MSG(("release\n"));
-					sleep(1);
-					//自分を取得
-					SimObj *my = getObj(myname());
-					//自分の手のパーツを得ます
-					CParts * parts = my->getParts("RARM_LINK7");
-					if (parts->graspObj(with[i])){
-						
-						m_grasp = true;
-						
-					}
+					m_release = true;
 				}
 			}
 		}

@@ -27,6 +27,8 @@ private:
 	std::string m_trashName1;
 	std::string m_trashName2;
 
+	std::vector<std::string> trashNames;
+
 	//移動速度
 	double vel;
 	ViewService *m_view;
@@ -52,6 +54,9 @@ private:
 
 	// 物体把持のフラグ
 	bool m_grasp;
+
+	//物体開放のフラグ
+	bool m_release;
 };
 
 void UserController::onInit(InitEvent &evt)
@@ -62,7 +67,10 @@ void UserController::onInit(InitEvent &evt)
 	m_trashName1 = "petbottle_1";
 	m_trashName2 = "can_0";
 
-	m_graspObjectName = m_trashName2;
+	trashNames.push_back(m_trashName1);
+	trashNames.push_back(m_trashName2);
+
+	//m_graspObjectName = m_trashName2;
 
 
 	//m_kinect = connectToService("SIGKINECT");
@@ -95,6 +103,7 @@ void UserController::onInit(InitEvent &evt)
 	pyaw = ppitch = proll = 0.0;
 
 	m_grasp = false;
+	m_release = false;
 }
 
 //定期的に呼び出される関数
@@ -174,7 +183,9 @@ void UserController::onRecvMsg(RecvMsgEvent &evt)
 	}
 	else if (ss == "release") {
 		this->throwTrash();
-		LOG_MSG(("User:release\n"));
+		std::string msg = "release";
+		msg += " " + m_graspObjectName;
+		sendMsg("robot_000", msg);
 	}
 
 
@@ -185,10 +196,6 @@ void UserController::onRecvMsg(RecvMsgEvent &evt)
 	sendMsg(robotName,"init");
 	}
 
-	else{
-		ss = "User:" + ss + "\n";
-		LOG_MSG((ss.c_str()));
-	}
 }
 
 void UserController::moveHeadByHMD(const std::string ss){
@@ -354,14 +361,17 @@ void UserController::onCollision(CollisionEvent &evt) {
 
 		//　衝突したエンティティでループします
 		for (int i = 0; i < with.size(); i++){
-			if (m_graspObjectName == with[i]){
-				//右手に衝突した場合
-				if (mparts[i] == "RARM_LINK7"){
-					//自分を取得
-					SimObj *my = getObj(myname());
-					//自分の手のパーツを得ます
-					CParts * parts = my->getParts("RARM_LINK7");
-					if (parts->graspObj(with[i])) m_grasp = true;
+			for (int j = 0; j < trashNames.size(); j++){
+				m_graspObjectName = trashNames[j];
+				if (trashNames[j] == with[i]){
+					//右手に衝突した場合
+					if (mparts[i] == "RARM_LINK7"){
+						//自分を取得
+						SimObj *my = getObj(myname());
+						//自分の手のパーツを得ます
+						CParts * parts = my->getParts("RARM_LINK7");
+						if (parts->graspObj(with[i])) m_grasp = true;
+					}
 				}
 			}
 		}
