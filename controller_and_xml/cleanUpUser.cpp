@@ -26,6 +26,7 @@ private:
 	std::string m_graspObjectName;
 	std::string m_trashName1;
 	std::string m_trashName2;
+	std::string m_trashName3;
 
 	std::vector<std::string> trashNames;
 
@@ -66,9 +67,11 @@ void UserController::onInit(InitEvent &evt)
 
 	m_trashName1 = "petbottle_1";
 	m_trashName2 = "can_0";
+	m_trashName3 = "kettle";
 
 	trashNames.push_back(m_trashName1);
 	trashNames.push_back(m_trashName2);
+	trashNames.push_back(m_trashName3);
 
 	//m_graspObjectName = m_trashName2;
 
@@ -362,7 +365,6 @@ void UserController::onCollision(CollisionEvent &evt) {
 		//　衝突したエンティティでループします
 		for (int i = 0; i < with.size(); i++){
 			for (int j = 0; j < trashNames.size(); j++){
-				m_graspObjectName = trashNames[j];
 				if (trashNames[j] == with[i]){
 					//右手に衝突した場合
 					if (mparts[i] == "RARM_LINK7"){
@@ -370,7 +372,10 @@ void UserController::onCollision(CollisionEvent &evt) {
 						SimObj *my = getObj(myname());
 						//自分の手のパーツを得ます
 						CParts * parts = my->getParts("RARM_LINK7");
-						if (parts->graspObj(with[i])) m_grasp = true;
+						if (parts->graspObj(with[i])){
+							m_grasp = true;
+							m_graspObjectName = trashNames[j];
+						}
 					}
 				}
 			}
