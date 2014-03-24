@@ -105,20 +105,34 @@ std::string VoiceRecognition::japaneseMessage2englishMessage(std::string japanes
 
 	//クリーンナップ開始
 	if (ja_str == "片づけます") en_str = "go";
+	else if (ja_str == "始めます") en_str = "go";
 
 	//把持対象の指定
 	else if (ja_str == "緑色のゴミ箱") en_str = "trashbox_0";
+	else if (ja_str == "緑色もゴミ箱") en_str = "trashbox_0";
+	else if (ja_str == "緑のゴミ箱") en_str = "trashbox_0";
+	else if (ja_str == "緑もゴミ箱") en_str = "trashbox_0";
 	//else if (ja_str == "これをとって") en_str = "take";
 
 	//捨てるor置く対象の指定
 	else if (ja_str == "赤色のゴミ箱") en_str = "trashbox_1";
+	else if (ja_str == "赤色もゴミ箱") en_str = "trashbox_1";
+	else if (ja_str == "赤のゴミ箱") en_str = "trashbox_1";
+	else if (ja_str == "赤もゴミ箱") en_str = "trashbox_1";
+	else if (ja_str == "赤いゴミ箱") en_str = "trashbox_1";
 	//else if (ja_str == "これに捨てて") en_str = "put";
 	//else if (ja_str == "そこに捨てて") en_str = "put";
 	
 	else if (ja_str == "青色のゴミ箱") en_str = "trashbox_2";
+	else if (ja_str == "青色もゴミ箱") en_str = "trashbox_2";
+	else if (ja_str == "青のゴミ箱") en_str = "trashbox_2";
+	else if (ja_str == "青もゴミ箱") en_str = "trashbox_2";
+	else if (ja_str == "青いゴミ箱") en_str = "trashbox_2";
 	//else if (ja_str == "ここにおいて") en_str = "put";
 
 	else if (ja_str == "茶色のワゴン") en_str = "wagon_0";
+	else if (ja_str == "サイロのワゴン") en_str = "wagon_0";
+	else if (ja_str == "最後のワゴン") en_str = "wagon_0";
 
 	//捨てるor置く対象を間違った場合やり直す
 	else if (ja_str == "終わります") en_str = "finish";	
@@ -142,7 +156,7 @@ std::string VoiceRecognition::englishMessage2japaneseMessage(std::string english
 	}
 	else if (en_str == "please pass my hand")
 	{
-		ja_str = "片付けたい物体を右手に渡してください";
+		ja_str = "片付けたい物体を右手でつかんで、ロボットの右手に渡してください";
 	}
 	/*else if (en_str == "Message is not accepted")
 	{
@@ -155,17 +169,17 @@ std::string VoiceRecognition::englishMessage2japaneseMessage(std::string english
 	else if (en_str == "petbottle_1") 
 	{
 		m_pointedObject = "ペットボトル";
-		ja_str = m_pointedObject + "を捨てます";
+		ja_str = m_pointedObject + "、を捨てます";
 	}
 	else if (en_str == "kettle") 
 	{
 		m_pointedObject = "ケトル";
-		ja_str = m_pointedObject + "を取ります";
+		ja_str = m_pointedObject + "、を置きます";
 	}
 	else if (en_str == "can_0")
 	{
 		m_pointedObject = "缶";
-		ja_str = "、" +m_pointedObject + "を捨てます";
+		ja_str = "、" +m_pointedObject + "、を捨てます";
 	}
 	else if (en_str == "finish")
 	{
@@ -173,7 +187,7 @@ std::string VoiceRecognition::englishMessage2japaneseMessage(std::string english
 	}
 	else if (en_str == "Please show me which trash box to use")
 	{
-		ja_str = m_pointedObject + "を運ぶ先を教えて下さい";
+		ja_str = m_pointedObject + "、を運ぶ先を教えて下さい";
 	}
 	else if (en_str == "trashbox_0")
 	{
