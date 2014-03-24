@@ -695,22 +695,13 @@ void DemoRobotController::onRecvMsg(RecvMsgEvent &evt) {
 	tmpss.assign(ss, strPos2 + 1, ss.length() - strPos2);
 
 	if (!m_grasp && headss == "release"){
-		//自分自身の取得
-		SimObj *my = getObj(myname());
-		//自分の手のパーツを得ます
-		CParts * parts = my->getParts("RARM_LINK7");
-		LOG_MSG((tmpss.c_str()));
-		if (parts->graspObj(tmpss)){
-			sendMsg("VoiceReco_Service", tmpss);
-			m_grasp = true;
-			m_state = 143;
-		}
+		m_release = false;
 	}
 	else if (m_state == 0){
 		if (ss == "go"){
 			m_state = 140;
 		}
-		else sendMsg("VoiceReco_Service", "Message is not accepted");
+		//else sendMsg("VoiceReco_Service", "Message is not accepted");
 	}
 	else if (m_state == 145){
 		if (ss == "trashbox_0"){
@@ -737,7 +728,7 @@ void DemoRobotController::onRecvMsg(RecvMsgEvent &evt) {
 			frontTrashBox = m_frontTrashBox3;
 			m_state = 150;
 		}
-		else sendMsg("VoiceReco_Service", "Message is not accepted");
+		//else sendMsg("VoiceReco_Service", "Message is not accepted");
 	}
 	else if (ss == "finish"){
 		sendMsg("VoiceReco_Service", ss);
@@ -761,9 +752,16 @@ void DemoRobotController::onCollision(CollisionEvent &evt) {
 				if (trashNames[j] == with[i]){
 					//右手に衝突した場合
 					if (mparts[i] == "RARM_LINK7"){
-						sendMsg("man_000", "release");
-						m_release = true;
-						m_graspObjectName = trashNames[j];
+						//自分を取得
+						SimObj *my = getObj(myname());
+						//自分の手のパーツを得ます
+						CParts * parts = my->getParts("RARM_LINK7");
+						if (parts->graspObj(with[i])){
+							m_grasp = true;
+							m_graspObjectName = trashNames[j];
+							sendMsg("VoiceReco_Service", m_graspObjectName);
+							m_state = 143;
+						}
 					}
 				}
 			}
@@ -900,7 +898,7 @@ void DemoRobotController::throwTrash(void){
 
 	// set the grasping flag to neutral
 	m_grasp = false;
-	m_release = false;
+	m_release = true;
 }
 
 
