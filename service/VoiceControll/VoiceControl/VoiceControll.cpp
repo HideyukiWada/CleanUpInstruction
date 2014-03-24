@@ -144,10 +144,10 @@ std::string VoiceRecognition::englishMessage2japaneseMessage(std::string english
 	{
 		ja_str = "•Ğ•t‚¯‚½‚¢•¨‘Ì‚ğ‰Eè‚É“n‚µ‚Ä‚­‚¾‚³‚¢";
 	}
-	else if (en_str == "Message is not accepted")
+	/*else if (en_str == "Message is not accepted")
 	{
 		ja_str = "•·‚«æ‚ê‚Ü‚¹‚ñB";
-	}
+	}*/
 	else if (en_str == "please choose the trashbox")
 	{
 		ja_str = "‚Á‚Ä‚¢‚­æ‚ğ‹³‚¦‚Ä‚­‚¾‚³‚¢";
