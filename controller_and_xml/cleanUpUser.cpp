@@ -3,6 +3,7 @@
 #include <Logger.h>
 #include <ViewImage.h>
 #include <math.h>
+#include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -355,8 +356,10 @@ void UserController::moveBodyByKINECT(char* all_msg){
 }
 
 void UserController::onCollision(CollisionEvent &evt) {
+	typedef CollisionEvent::WithC C;
+	
+
 	if (m_grasp == false){
-		typedef CollisionEvent::WithC C;
 		//触れたエンティティの名前を得ます
 		const std::vector<std::string> & with = evt.getWith();
 		// 衝突した自分のパーツを得ます  
@@ -376,6 +379,27 @@ void UserController::onCollision(CollisionEvent &evt) {
 							m_grasp = true;
 							m_graspObjectName = trashNames[j];
 						}
+					}
+				}
+			}
+		}
+	}
+	else {
+		//触れたエンティティの名前を得ます
+		const std::vector<std::string> & with = evt.getWith();
+		// 衝突した自分のパーツを得ます  
+		const std::vector<std::string> & mparts = evt.getMyParts();
+		// 衝突したエンティティのパーツを得ます
+		const std::vector<std::string> & wparts = evt.getWithParts();
+
+		//衝突したエンティティでループします
+		for (int i = 0; i < with.size(); i++){
+			if (with[i] == "robot_000"){
+				//ロボットの右手に衝突した場合
+				if (wparts[i] == "RARM_LINK7"){
+					if (mparts[i] == "RARM_LINK7"){
+						this->throwTrash();
+						sendMsg("robot_000", "release");
 					}
 				}
 			}
