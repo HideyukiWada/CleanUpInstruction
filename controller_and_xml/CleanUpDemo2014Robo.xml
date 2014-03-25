@@ -26,9 +26,9 @@
     <set-attr-value name="implementation"
                     value="./CleanUpDemo2014Robo.so"/>
     <set-attr-value name="dynamics" value="false"/>
-    <set-attr-value name="x" value="180.0"/>
+    <set-attr-value name="x" value="190.0"/>
     <set-attr-value name="y" value="30.0"/>
-    <set-attr-value name="z" value="-50.0"/>
+    <set-attr-value name="z" value="-70.0"/>
     <set-attr-value name="qw" value="0.707"/>
     <!--<set-attr-value name="qx" value="3"/>-->
     <set-attr-value name="qy" value="0.707"/>
@@ -258,7 +258,7 @@
     <set-attr-value name="name" value="kettle"/>
     <set-attr-value name="dynamics" value="false"/>
     <set-attr-value name="x" value="313.0"/>
-    <set-attr-value name="y" value="68.0"/>
+    <set-attr-value name="y" value="73.0"/>
     <set-attr-value name="z" value="-5.0"/>
     <set-attr-value name="collision" value="true"/>
     <set-attr-value name="graspable" value="true"/>

@@ -123,7 +123,7 @@ void DemoRobotController::onInit(InitEvent &evt) {
 	m_relayPoint1    = Vector3d(190.0, 0.0, -65.0);
 	m_frontTrash1    = Vector3d(273.0, 0.0, -65.0);
 	m_frontTrash2    = Vector3d(305.0, 0.0, -80.0);
-	m_waitPosition   = Vector3d(180.0, 30.0, -50.0);
+	m_waitPosition   = Vector3d(185.0, 30.0, -70.0);
 	m_userPosition   = Vector3d(280.0, 30.0, -50.0);
 
 	m_grasp = false;

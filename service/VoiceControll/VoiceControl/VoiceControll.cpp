@@ -156,7 +156,7 @@ std::string VoiceRecognition::englishMessage2japaneseMessage(std::string english
 	}
 	else if (en_str == "please pass my hand")
 	{
-		ja_str = "片付けたい物体を右手でつかんで、ロボットの右手に渡してください";
+		ja_str = "片付けたい物体を手渡してください";
 	}
 	/*else if (en_str == "Message is not accepted")
 	{
