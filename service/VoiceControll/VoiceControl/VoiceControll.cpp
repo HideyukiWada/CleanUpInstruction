@@ -282,6 +282,8 @@ int main(int argc, char** argv)
 	//srv.onInit();
 	unsigned short port = (unsigned short)(atoi(argv[2]));
 	srv.connect(argv[1], port);
+	srv.connectToViewer();
+	srv.setAutoExitProc(true);
 	//srv.connect("136.187.35.129", 9005);
 	srv.startLoop();
 	return 0;
