@@ -415,7 +415,7 @@ void UserController::throwTrash(void){
 	parts->releaseObj();
 
 	// wait a bit
-	sleep(1);
+	//sleep(1);
 
 	// set the grasping flag to neutral
 	m_grasp = false;
