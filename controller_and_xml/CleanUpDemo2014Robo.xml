@@ -263,6 +263,19 @@
     <set-attr-value name="collision" value="true"/>
     <set-attr-value name="graspable" value="true"/>
   </instanciate>
+    <instanciate class="sobit_120_sgv.xml">
+    <set-attr-value name="name" value="sobit_120"/>
+    <set-attr-value name="dynamics" value="false"/>
+    <set-attr-value name="x" value="205.0"/>
+    <set-attr-value name="y" value="43.0"/>
+    <set-attr-value name="z" value="-215.0"/>
+      <set-attr-value name="qw" value="0.0"/>
+      <set-attr-value name="qx" value="-0.0"/>
+      <set-attr-value name="qy" value="-1.0"/>
+      <set-attr-value name="qz" value="-0.0"/>
+    <set-attr-value name="collision" value="true"/>
+    <set-attr-value name="graspable" value="true"/>
+  </instanciate>
 
 
 <!-- faniture -->
