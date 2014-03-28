@@ -4,6 +4,8 @@
 #include <unistd.h>
 #include <algorithm>
 #include <stdlib.h>
+#include <string>
+#include <sstream>
 
 //convert angle unit from degree to radian
 #define DEG2RAD(DEG) ( (M_PI) * (DEG) / 180.0 )
@@ -75,6 +77,9 @@ private:
 
   // angular parameter used to put robot's hands down
   double thetaA;
+
+  std::stringstream ss;
+  int error_count;
 };
 
 
@@ -128,6 +133,8 @@ void DemoRobotController::onInit(InitEvent &evt) {
 
 	m_grasp = false;
 	m_release = false;
+
+	error_count = 0;
 }
 
 
@@ -683,55 +690,79 @@ void DemoRobotController::onRecvMsg(RecvMsgEvent &evt) {
 	//メッセージ取得
 	char *all_msg = (char*)evt.getMsg();
 
-	std::string ss = all_msg;
+	std::string str = all_msg;
 	//ヘッダーの取り出し
 	int strPos1 = 0;
 	int strPos2;
 
 	std::string headss;
 	std::string tmpss;
-	strPos2 = ss.find(" ", strPos1);
-	headss.assign(ss, strPos1, strPos2 - strPos1);
-	tmpss.assign(ss, strPos2 + 1, ss.length() - strPos2);
+	strPos2 = str.find(" ", strPos1);
+	headss.assign(str, strPos1, strPos2 - strPos1);
+	tmpss.assign(str, strPos2 + 1, str.length() - strPos2);
 
 	if (!m_grasp && headss == "release"){
 		m_release = false;
 	}
 	else if (m_state == 0){
-		if (ss == "go"){
+		if (str == "error"){
+			error_count++;
+			ss << error_count << ":Recognition Failure!!";
+			sendMsg("SIGViewer", ss.str());
+			ss.str("");
+			ss.clear();
+		}
+		else if (str == "go"){
+			sendMsg("SIGViewer", "Recognition Success!!");
+			error_count = 0;
 			m_state = 140;
 		}
 		//else sendMsg("VoiceReco_Service", "Message is not accepted");
 	}
 	else if (m_state == 145){
-		if (ss == "trashbox_0"){
-			sendMsg("VoiceReco_Service", ss);
-			trashBoxName = ss;
+		if (str == "error"){
+			error_count++;
+			ss << error_count << ":Recognition Failure!!";
+			sendMsg("SIGViewer", ss.str());
+			ss.str("");
+			ss.clear();
+		}
+		else if (str == "trashbox_0"){
+			sendMsg("VoiceReco_Service", str);
+			trashBoxName = str;
 			frontTrashBox = m_frontTrashBox1;
+			sendMsg("SIGViewer", "Recognition Success!!");
+			error_count = 0;
 			m_state = 150;
 		}
-		else if (ss == "trashbox_1"){
-			sendMsg("VoiceReco_Service", ss);
-			trashBoxName = ss;
+		else if (str == "trashbox_1"){
+			sendMsg("VoiceReco_Service", str);
+			trashBoxName = str;
 			frontTrashBox = m_frontTrashBox2;
+			sendMsg("SIGViewer", "Recognition Success!!");
+			error_count = 0;
 			m_state = 150;
 		}
-		else if (ss == "trashbox_2"){
-			sendMsg("VoiceReco_Service", ss);
-			trashBoxName = ss;
+		else if (str == "trashbox_2"){
+			sendMsg("VoiceReco_Service", str);
+			trashBoxName = str;
 			frontTrashBox = m_frontTrashBox3;
+			sendMsg("SIGViewer", "Recognition Success!!");
+			error_count = 0;
 			m_state = 150;
 		}
-		else if (ss == "wagon_0"){
-			sendMsg("VoiceReco_Service", ss);
-			trashBoxName = ss;
+		else if (str == "wagon_0"){
+			sendMsg("VoiceReco_Service", str);
+			trashBoxName = str;
 			frontTrashBox = m_frontTrashBox3;
+			sendMsg("SIGViewer", "Recognition Success!!");
+			error_count = 0;
 			m_state = 150;
 		}
 		//else sendMsg("VoiceReco_Service", "Message is not accepted");
 	}
-	else if (ss == "finish"){
-		sendMsg("VoiceReco_Service", ss);
+	else if (str == "finish"){
+		sendMsg("VoiceReco_Service", str);
 		disconnectToService("VoiceReco_Service");
 		disconnectToService("SIGKINECT");
 	}
