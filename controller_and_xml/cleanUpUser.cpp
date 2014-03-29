@@ -357,6 +357,19 @@ void UserController::moveBodyByKINECT(char* all_msg){
 
 void UserController::onCollision(CollisionEvent &evt) {
 	typedef CollisionEvent::WithC C;
+	////触れたエンティティの名前を得ます
+	//const std::vector<std::string> & with = evt.getWith();
+	//// 衝突した自分のパーツを得ます  
+	//const std::vector<std::string> & mparts = evt.getMyParts();
+	//// 衝突したエンティティのパーツを得ます
+	//const std::vector<std::string> & wparts = evt.getWithParts();
+	//std::cout << "withSize:" << with.size() << "  mpartsSIze:" << mparts.size() << "  wpartsSIze:" << wparts.size() << "==============="<< std::endl;
+	//for (int i = 0; i < with.size(); i++){
+	//	std::cout << "  with[" << i << "]:" << with[i] << std::endl;
+	//	std::cout << "mparts[" << i << "]:" << mparts[i] << std::endl;
+	//	std::cout << "wparts[" << i << "]:" << wparts[i] << std::endl << std::endl;
+	//}
+	//std::cout << "==========================================================================="<< std::endl;
 	
 
 	if (m_grasp == false){
