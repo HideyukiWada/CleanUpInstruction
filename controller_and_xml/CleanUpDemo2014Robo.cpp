@@ -132,24 +132,24 @@ void DemoRobotController::onInit(InitEvent &evt) {
 	m_userPosition   = Vector3d(280.0, 30.0, -50.0);
 
 	m_grasp = false;
-	m_release = false;
+	m_release = true;
 
 	error_count = 0;
 }
 
 
 double DemoRobotController::onAction(ActionEvent &evt) {
-	switch(m_state){
-		case 0: {
-			break;
-		}
-		case 140: {
+	switch (m_state){
+	case 0: {
+				break;
+	}
+	case 140: {
 				this->neutralizeArms(evt.time());
 				m_state = 141;
 				sendMsg("VoiceReco_Service", "start");
 				break;
-		}
-		case 141: {
+	}
+	case 141: {
 				if (evt.time() >= m_time1 && m_state == 141) m_robotObject->setJointVelocity("RARM_JOINT1", 0.0, 0.0);
 				if (evt.time() >= m_time4 && m_state == 141) m_robotObject->setJointVelocity("RARM_JOINT4", 0.0, 0.0);
 				if (evt.time() >= m_time1 && evt.time() >= m_time4 && m_state == 141){
@@ -158,165 +158,180 @@ double DemoRobotController::onAction(ActionEvent &evt) {
 					m_state = 142;
 				}
 				break;
-		}
-		//発話対機状態
-		case 142: {
+	}
+		//手渡し対機
+	case 142: {
+				if (m_grasp == false && m_release == false){
+					//自分を取得
+					SimObj *my = getRobotObj(myname());
+					//自分の手のパーツを得ます
+					CParts * parts = my->getParts("RARM_LINK7");
+					sendMsg("SIGViewer", m_graspObjectName);
+					if (parts->graspObj(m_graspObjectName)){
+						m_grasp = true;
+						sendMsg("VoiceReco_Service", m_graspObjectName);
+						m_state = 143;
+					}
+				}
 				break;
-		}
-		case 143: {
+	}
+	case 143: {
 				double l_moveTime = rotateTowardObj(Vector3d(10.0, 0.0, -90));
 
 				m_time = l_moveTime + evt.time();
 				m_state = 144;
 				break;
-		}
-		case 144: {
+	}
+	case 144: {
 				if (evt.time() >= m_time && m_state == 144){
 					this->stopRobotMove();
 					sendMsg("VoiceReco_Service", "please choose the trashbox");
 					m_state = 145;
 				}
 				break;
-		}
-		//発話対機状態
-		case 145: {
-				break;
-		}
-		case 150: {
-			double l_moveTime = rotateTowardObj(frontTrashBox);
-
-			m_time = l_moveTime + evt.time();
-			m_state = 160;
-			break;
-		}
-		case 160: {
-			if(evt.time() >= m_time && m_state==160){
-				this->stopRobotMove();
-				double l_moveTime = goToObj(frontTrashBox,0.0);
-				m_time = l_moveTime + evt.time();
-				m_state = 161;
-			}
-			break;
-		}
-		case 161: {
-			if(evt.time() >= m_time && m_state==161){
-				this->stopRobotMove();
-				this->prepareThrowing(evt.time());
-
-				m_state = 165;
-			}
-			break;
-		}
-		case 165: {
-			if(evt.time() >= m_time1 && m_state==165) m_robotObject->setJointVelocity("RARM_JOINT1", 0.0, 0.0);
-			if(evt.time() >= m_time4 && m_state==165) m_robotObject->setJointVelocity("RARM_JOINT4", 0.0, 0.0);
-			if(evt.time() >= m_time1 && evt.time() >= m_time4 && m_state==165){
-				this->stopRobotMove();
-				Vector3d l_tpos;
-				this->recognizeObjectPosition(l_tpos, trashBoxName);
-				double l_moveTime = rotateTowardObj(l_tpos);
-				m_time = l_moveTime + evt.time();
-
-				m_state = 170;
-			}
-			break;
-		}
-		case 170: {
-			if(evt.time() >= m_time && m_state==170){
-
-				this->stopRobotMove();
-				Vector3d l_tpos;
-				this->recognizeObjectPosition(l_tpos, trashBoxName);
-				double l_moveTime = goToObj(l_tpos, 50.0);
-				m_time = l_moveTime + evt.time();
-
-				m_state = 180;
-			}
-			break;
-		}
-		case 180: {
-			if(evt.time() >= m_time && m_state==180){
-				this->stopRobotMove();
-				Vector3d l_tpos;
-				this->recognizeObjectPosition(l_tpos, trashBoxName);
-				double l_moveTime = rotateTowardObj(l_tpos);
-				m_time = l_moveTime + evt.time();
-
-				m_state = 200;
-			}
-			break;
-		}
-		case 200: {  // throw trash and get back a bit
-			if(evt.time() >= m_time && m_state==200){
-				this->stopRobotMove();
-				this->throwTrash();
-
-				sleep(1);
-
-				m_robotObject->setWheelVelocity(-m_angularVelocity, -m_angularVelocity);
-				m_time = 80.0/m_movingSpeed + evt.time();
-
-				m_state = 225;
-			}
-			break;
-		}
-		case 225: {  // recover robot arms
-			if(evt.time() >= m_time && m_state==225){
-				this->stopRobotMove();
-				this->neutralizeArms(evt.time());
-
-				m_state = 230;
-			}
-			break;
-		}
-		case 230: {
-			if (evt.time() >= m_time1 && m_state == 230) m_robotObject->setJointVelocity("RARM_JOINT1", 0.0, 0.0);
-			if (evt.time() >= m_time4 && m_state == 230) m_robotObject->setJointVelocity("RARM_JOINT4", 0.0, 0.0);
-			if (evt.time() >= m_time1 && evt.time() >= m_time4 && m_state == 230){
-				double l_moveTime = rotateTowardObj(m_waitPosition);
-
-				m_time = l_moveTime + evt.time();
-				m_state = 231;
-			}
-			break;
-		}
-		case 231: {
-			if (evt.time() >= m_time && m_state == 231){
-				this->stopRobotMove();
-				double l_moveTime = goToObj(m_waitPosition, 0.0);
-				m_time = l_moveTime + evt.time();
-				m_state = 232;
-			}
-			break;
-		}
-		case 232: {
-			if (evt.time() >= m_time && m_state == 232){
-				double l_moveTime = rotateTowardObj(m_userPosition);
-
-				m_time = l_moveTime + evt.time();
-				m_state = 233;
-			}
-			break;
-		}
-		case 233: {
-			if (evt.time() >= m_time && m_state == 233){
-				this->stopRobotMove();
-				this->neutralizeArms(evt.time());
-
-				m_state = 141;
-			}
-			break;
-		}
-		case 234: {
-			if (evt.time() >= m_time1 && m_state == 234) m_robotObject->setJointVelocity("RARM_JOINT1", 0.0, 0.0);
-			if (evt.time() >= m_time4 && m_state == 234) m_robotObject->setJointVelocity("RARM_JOINT4", 0.0, 0.0);
-			if (evt.time() >= m_time1 && evt.time() >= m_time4 && m_state == 234){
-				this->stopRobotMove();
-				m_state = 141;
-			}
-			break;
-		}
 	}
+		//発話対機状態
+	case 145: {
+			  break;
+	}
+	case 150: {
+				double l_moveTime = rotateTowardObj(frontTrashBox);
+
+				m_time = l_moveTime + evt.time();
+				m_state = 160;
+				break;
+	}
+	case 160: {
+				if (evt.time() >= m_time && m_state == 160){
+					this->stopRobotMove();
+					double l_moveTime = goToObj(frontTrashBox, 0.0);
+					m_time = l_moveTime + evt.time();
+					m_state = 161;
+				}
+				break;
+	}
+	case 161: {
+				if (evt.time() >= m_time && m_state == 161){
+					this->stopRobotMove();
+					this->prepareThrowing(evt.time());
+
+					m_state = 165;
+				}
+				break;
+	}
+	case 165: {
+				if (evt.time() >= m_time1 && m_state == 165) m_robotObject->setJointVelocity("RARM_JOINT1", 0.0, 0.0);
+				if (evt.time() >= m_time4 && m_state == 165) m_robotObject->setJointVelocity("RARM_JOINT4", 0.0, 0.0);
+				if (evt.time() >= m_time1 && evt.time() >= m_time4 && m_state == 165){
+					this->stopRobotMove();
+					Vector3d l_tpos;
+					this->recognizeObjectPosition(l_tpos, trashBoxName);
+					double l_moveTime = rotateTowardObj(l_tpos);
+					m_time = l_moveTime + evt.time();
+
+					m_state = 170;
+				}
+				break;
+	}
+	case 170: {
+				if (evt.time() >= m_time && m_state == 170){
+
+					this->stopRobotMove();
+					Vector3d l_tpos;
+					this->recognizeObjectPosition(l_tpos, trashBoxName);
+					double l_moveTime = goToObj(l_tpos, 50.0);
+					m_time = l_moveTime + evt.time();
+
+					m_state = 180;
+				}
+				break;
+	}
+	case 180: {
+				if (evt.time() >= m_time && m_state == 180){
+					this->stopRobotMove();
+					Vector3d l_tpos;
+					this->recognizeObjectPosition(l_tpos, trashBoxName);
+					double l_moveTime = rotateTowardObj(l_tpos);
+					m_time = l_moveTime + evt.time();
+
+					m_state = 200;
+				}
+				break;
+	}
+	case 200: {  // throw trash and get back a bit
+				if (evt.time() >= m_time && m_state == 200){
+					this->stopRobotMove();
+					this->throwTrash();
+
+					sleep(1);
+
+					m_robotObject->setWheelVelocity(-m_angularVelocity, -m_angularVelocity);
+					m_time = 80.0 / m_movingSpeed + evt.time();
+
+					m_state = 225;
+				}
+				break;
+	}
+	case 225: {  // recover robot arms
+				if (evt.time() >= m_time && m_state == 225){
+					this->stopRobotMove();
+					this->neutralizeArms(evt.time());
+
+					m_state = 230;
+				}
+				break;
+	}
+	case 230: {
+				if (evt.time() >= m_time1 && m_state == 230) m_robotObject->setJointVelocity("RARM_JOINT1", 0.0, 0.0);
+				if (evt.time() >= m_time4 && m_state == 230) m_robotObject->setJointVelocity("RARM_JOINT4", 0.0, 0.0);
+				if (evt.time() >= m_time1 && evt.time() >= m_time4 && m_state == 230){
+					double l_moveTime = rotateTowardObj(m_waitPosition);
+
+					m_time = l_moveTime + evt.time();
+					m_state = 231;
+				}
+				break;
+	}
+	case 231: {
+				if (evt.time() >= m_time && m_state == 231){
+					this->stopRobotMove();
+					double l_moveTime = goToObj(m_waitPosition, 0.0);
+					m_time = l_moveTime + evt.time();
+					m_state = 232;
+				}
+				break;
+	}
+	case 232: {
+				if (evt.time() >= m_time && m_state == 232){
+					double l_moveTime = rotateTowardObj(m_userPosition);
+
+					m_time = l_moveTime + evt.time();
+					m_state = 233;
+				}
+				break;
+	}
+	case 233: {
+				if (evt.time() >= m_time && m_state == 233){
+					this->stopRobotMove();
+					this->neutralizeArms(evt.time());
+
+					m_state = 141;
+				}
+				break;
+	}
+	case 234: {
+				if (evt.time() >= m_time1 && m_state == 234) m_robotObject->setJointVelocity("RARM_JOINT1", 0.0, 0.0);
+				if (evt.time() >= m_time4 && m_state == 234) m_robotObject->setJointVelocity("RARM_JOINT4", 0.0, 0.0);
+				if (evt.time() >= m_time1 && evt.time() >= m_time4 && m_state == 234){
+					this->stopRobotMove();
+					m_state = 141;
+				}
+				break;
+	}
+	}
+
+	
+
 
 	return refreshRateOnAction;
 }
@@ -342,6 +357,8 @@ void DemoRobotController::onRecvMsg(RecvMsgEvent &evt) {
 
 	if (!m_grasp && headss == "release"){
 		m_release = false;
+		m_graspObjectName = tmpss;
+		sendMsg("SIGViewer", m_graspObjectName);
 	}
 	else if (m_state == 0){
 		if (str == "error"){
@@ -409,34 +426,34 @@ void DemoRobotController::onRecvMsg(RecvMsgEvent &evt) {
 
 
 void DemoRobotController::onCollision(CollisionEvent &evt) {
-	if (m_grasp == false && m_release == false){
-		typedef CollisionEvent::WithC C;
-		//触れたエンティティの名前を得ます
-		const std::vector<std::string> & with = evt.getWith();
-		// 衝突した自分のパーツを得ます  
-		const std::vector<std::string> & mparts = evt.getMyParts();
+	//if (m_grasp == false && m_release == false){
+	//	typedef CollisionEvent::WithC C;
+	//	//触れたエンティティの名前を得ます
+	//	const std::vector<std::string> & with = evt.getWith();
+	//	// 衝突した自分のパーツを得ます  
+	//	const std::vector<std::string> & mparts = evt.getMyParts();
 
-		//　衝突したエンティティでループします
-		for(int i = 0; i < with.size(); i++){
-			for (int j = 0; j < trashNames.size(); j++){
-				if (trashNames[j] == with[i]){
-					//右手に衝突した場合
-					if (mparts[i] == "RARM_LINK7"){
-						//自分を取得
-						SimObj *my = getObj(myname());
-						//自分の手のパーツを得ます
-						CParts * parts = my->getParts("RARM_LINK7");
-						if (parts->graspObj(with[i])){
-							m_grasp = true;
-							m_graspObjectName = trashNames[j];
-							sendMsg("VoiceReco_Service", m_graspObjectName);
-							m_state = 143;
-						}
-					}
-				}
-			}
-		}
-	}
+	//	//　衝突したエンティティでループします
+	//	for(int i = 0; i < with.size(); i++){
+	//		for (int j = 0; j < trashNames.size(); j++){
+	//			if (trashNames[j] == with[i]){
+	//				//右手に衝突した場合
+	//				if (mparts[i] == "RARM_LINK7"){
+	//					//自分を取得
+	//					SimObj *my = getObj(myname());
+	//					//自分の手のパーツを得ます
+	//					CParts * parts = my->getParts("RARM_LINK7");
+	//					if (parts->graspObj(with[i])){
+	//						m_grasp = true;
+	//						m_graspObjectName = trashNames[j];
+	//						sendMsg("VoiceReco_Service", m_graspObjectName);
+	//						m_state = 143;
+	//					}
+	//				}
+	//			}
+	//		}
+	//	}
+	//}
 }
 
 

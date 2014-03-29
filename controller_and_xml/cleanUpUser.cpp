@@ -399,7 +399,9 @@ void UserController::onCollision(CollisionEvent &evt) {
 				if (wparts[i] == "RARM_LINK7"){
 					if (mparts[i] == "RARM_LINK7"){
 						this->throwTrash();
-						sendMsg("robot_000", "release");
+						std::string msg = "release";
+						msg += " " + m_graspObjectName;
+						sendMsg("robot_000", msg);
 					}
 				}
 			}
