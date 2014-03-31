@@ -27,7 +27,7 @@ public:
 	void prepareThrowing(double evt_time);
 
 private:
-	RobotObj *m_robotObject;
+	/*RobotObj *m_robotObject;*/
 	ViewService *m_view;
 
 	int m_state; 
@@ -85,11 +85,12 @@ private:
 
 void DemoRobotController::onInit(InitEvent &evt) {
 	// get robot's name
-	m_robotObject = getRobotObj(myname());
+	/*m_robotObject = getRobotObj(myname());*/
 
 	// set wheel configuration
 	m_radius = 10.0;
 	m_distance = 10.0;
+	RobotObj *m_robotObject = getRobotObj(myname());
 	m_robotObject->setWheel(m_radius, m_distance);
 
 	m_time = 0.0;
@@ -97,6 +98,9 @@ void DemoRobotController::onInit(InitEvent &evt) {
 	m_time4 = 0.0;
 
 	m_state = 0;  // switch of initial behavior
+	//m_state = 9140;
+
+
 	refreshRateOnAction = 0.1;     // refresh-rate for onAction proc.
 
 	// angular velocity of wheel and moving speed of robot
@@ -146,16 +150,27 @@ double DemoRobotController::onAction(ActionEvent &evt) {
 	case 140: {
 				this->neutralizeArms(evt.time());
 				m_state = 141;
+				LOG_MSG(("m_state:%d\n", m_state));
 				sendMsg("VoiceReco_Service", "start");
 				break;
 	}
 	case 141: {
-				if (evt.time() >= m_time1 && m_state == 141) m_robotObject->setJointVelocity("RARM_JOINT1", 0.0, 0.0);
+
+				RobotObj *m_robotObject = getRobotObj(myname());
+				double angleJoint1 = m_robotObject->getJointAngle("RARM_JOINT1")*180.0 / (M_PI);
+				double angleJoint4 = m_robotObject->getJointAngle("RARM_JOINT4")*180.0 / (M_PI);
+
+				LOG_MSG(("\nm_time1:%4f JOINT1 angle:%4f\nm_time4:%4f JOINT4 angle:%4f\n", m_time1, angleJoint1, m_time4, angleJoint4));
 				if (evt.time() >= m_time4 && m_state == 141) m_robotObject->setJointVelocity("RARM_JOINT4", 0.0, 0.0);
+				if (evt.time() >= m_time1 && m_state == 141) m_robotObject->setJointVelocity("RARM_JOINT1", 0.0, 0.0);
 				if (evt.time() >= m_time1 && evt.time() >= m_time4 && m_state == 141){
 					this->stopRobotMove();
 					sendMsg("VoiceReco_Service", "please pass my hand");
 					m_state = 142;
+					//m_state = 161;
+					//m_time = 6.0;
+
+					LOG_MSG(("m_state:%d\n", m_state));
 				}
 				break;
 	}
@@ -163,14 +178,15 @@ double DemoRobotController::onAction(ActionEvent &evt) {
 	case 142: {
 				if (m_grasp == false && m_release == false){
 					//自分を取得
-					SimObj *my = getRobotObj(myname());
+					RobotObj *m_robotObject = getRobotObj(myname());
 					//自分の手のパーツを得ます
-					CParts * parts = my->getParts("RARM_LINK7");
+					CParts * parts = m_robotObject->getParts("RARM_LINK7");
 					sendMsg("SIGViewer", m_graspObjectName);
 					if (parts->graspObj(m_graspObjectName)){
 						m_grasp = true;
 						sendMsg("VoiceReco_Service", m_graspObjectName);
 						m_state = 143;
+						LOG_MSG(("m_state:%d\n", m_state));
 					}
 				}
 				break;
@@ -180,6 +196,7 @@ double DemoRobotController::onAction(ActionEvent &evt) {
 
 				m_time = l_moveTime + evt.time();
 				m_state = 144;
+				LOG_MSG(("m_state:%d\n", m_state));
 				break;
 	}
 	case 144: {
@@ -187,6 +204,7 @@ double DemoRobotController::onAction(ActionEvent &evt) {
 					this->stopRobotMove();
 					sendMsg("VoiceReco_Service", "please choose the trashbox");
 					m_state = 145;
+					LOG_MSG(("m_state:%d\n", m_state));
 				}
 				break;
 	}
@@ -199,6 +217,7 @@ double DemoRobotController::onAction(ActionEvent &evt) {
 
 				m_time = l_moveTime + evt.time();
 				m_state = 160;
+				LOG_MSG(("m_state:%d\n", m_state));
 				break;
 	}
 	case 160: {
@@ -207,6 +226,7 @@ double DemoRobotController::onAction(ActionEvent &evt) {
 					double l_moveTime = goToObj(frontTrashBox, 0.0);
 					m_time = l_moveTime + evt.time();
 					m_state = 161;
+					LOG_MSG(("m_state:%d\n", m_state));
 				}
 				break;
 	}
@@ -216,12 +236,18 @@ double DemoRobotController::onAction(ActionEvent &evt) {
 					this->prepareThrowing(evt.time());
 
 					m_state = 165;
+					LOG_MSG(("m_state:%d\n", m_state));
 				}
 				break;
 	}
 	case 165: {
-				if (evt.time() >= m_time1 && m_state == 165) m_robotObject->setJointVelocity("RARM_JOINT1", 0.0, 0.0);
+				RobotObj *m_robotObject = getRobotObj(myname());
+				double angleJoint1 = m_robotObject->getJointAngle("RARM_JOINT1")*180.0 / (M_PI);
+				double angleJoint4 = m_robotObject->getJointAngle("RARM_JOINT4")*180.0 / (M_PI);
+
+				LOG_MSG(("\nm_time1:%4f JOINT1 angle:%4f\nm_time4:%4f JOINT4 angle:%4f\n", m_time1, angleJoint1, m_time4, angleJoint4));
 				if (evt.time() >= m_time4 && m_state == 165) m_robotObject->setJointVelocity("RARM_JOINT4", 0.0, 0.0);
+				if (evt.time() >= m_time1 && m_state == 165) m_robotObject->setJointVelocity("RARM_JOINT1", 0.0, 0.0);
 				if (evt.time() >= m_time1 && evt.time() >= m_time4 && m_state == 165){
 					this->stopRobotMove();
 					Vector3d l_tpos;
@@ -230,6 +256,7 @@ double DemoRobotController::onAction(ActionEvent &evt) {
 					m_time = l_moveTime + evt.time();
 
 					m_state = 170;
+					LOG_MSG(("m_state:%d\n", m_state));
 				}
 				break;
 	}
@@ -243,6 +270,7 @@ double DemoRobotController::onAction(ActionEvent &evt) {
 					m_time = l_moveTime + evt.time();
 
 					m_state = 180;
+					LOG_MSG(("m_state:%d\n", m_state));
 				}
 				break;
 	}
@@ -255,6 +283,7 @@ double DemoRobotController::onAction(ActionEvent &evt) {
 					m_time = l_moveTime + evt.time();
 
 					m_state = 200;
+					LOG_MSG(("m_state:%d\n", m_state));
 				}
 				break;
 	}
@@ -265,10 +294,12 @@ double DemoRobotController::onAction(ActionEvent &evt) {
 
 					sleep(1);
 
+					RobotObj *m_robotObject = getRobotObj(myname());
 					m_robotObject->setWheelVelocity(-m_angularVelocity, -m_angularVelocity);
 					m_time = 80.0 / m_movingSpeed + evt.time();
 
 					m_state = 225;
+					LOG_MSG(("m_state:%d\n", m_state));
 				}
 				break;
 	}
@@ -278,17 +309,25 @@ double DemoRobotController::onAction(ActionEvent &evt) {
 					this->neutralizeArms(evt.time());
 
 					m_state = 230;
+					LOG_MSG(("m_state:%d\n", m_state));
 				}
 				break;
 	}
 	case 230: {
-				if (evt.time() >= m_time1 && m_state == 230) m_robotObject->setJointVelocity("RARM_JOINT1", 0.0, 0.0);
+				  RobotObj *m_robotObject = getRobotObj(myname());
+				  double angleJoint1 = m_robotObject->getJointAngle("RARM_JOINT1")*180.0 / (M_PI);
+				  double angleJoint4 = m_robotObject->getJointAngle("RARM_JOINT4")*180.0 / (M_PI);
+
+				  LOG_MSG(("\nm_time1:%4f JOINT1 angle:%4f\nm_time4:%4f JOINT4 angle:%4f\n", m_time1, angleJoint1, m_time4, angleJoint4));
+
 				if (evt.time() >= m_time4 && m_state == 230) m_robotObject->setJointVelocity("RARM_JOINT4", 0.0, 0.0);
+				if (evt.time() >= m_time1 && m_state == 230) m_robotObject->setJointVelocity("RARM_JOINT1", 0.0, 0.0);
 				if (evt.time() >= m_time1 && evt.time() >= m_time4 && m_state == 230){
 					double l_moveTime = rotateTowardObj(m_waitPosition);
 
 					m_time = l_moveTime + evt.time();
 					m_state = 231;
+					LOG_MSG(("m_state:%d\n", m_state));
 				}
 				break;
 	}
@@ -298,6 +337,7 @@ double DemoRobotController::onAction(ActionEvent &evt) {
 					double l_moveTime = goToObj(m_waitPosition, 0.0);
 					m_time = l_moveTime + evt.time();
 					m_state = 232;
+					LOG_MSG(("m_state:%d\n", m_state));
 				}
 				break;
 	}
@@ -307,6 +347,7 @@ double DemoRobotController::onAction(ActionEvent &evt) {
 
 					m_time = l_moveTime + evt.time();
 					m_state = 233;
+					LOG_MSG(("m_state:%d\n", m_state));
 				}
 				break;
 	}
@@ -316,18 +357,103 @@ double DemoRobotController::onAction(ActionEvent &evt) {
 					this->neutralizeArms(evt.time());
 
 					m_state = 141;
+					LOG_MSG(("m_state:%d\n", m_state));
 				}
 				break;
 	}
 	case 234: {
-				if (evt.time() >= m_time1 && m_state == 234) m_robotObject->setJointVelocity("RARM_JOINT1", 0.0, 0.0);
+				  RobotObj *m_robotObject = getRobotObj(myname());
+				  double angleJoint1 = m_robotObject->getJointAngle("RARM_JOINT1")*180.0 / (M_PI);
+				  double angleJoint4 = m_robotObject->getJointAngle("RARM_JOINT4")*180.0 / (M_PI);
+
+				  LOG_MSG(("\nm_time1:%4f JOINT1 angle:%4f\nm_time4:%4f JOINT4 angle:%4f\n", m_time1, angleJoint1, m_time4, angleJoint4));
+
 				if (evt.time() >= m_time4 && m_state == 234) m_robotObject->setJointVelocity("RARM_JOINT4", 0.0, 0.0);
+				if (evt.time() >= m_time1 && m_state == 234) m_robotObject->setJointVelocity("RARM_JOINT1", 0.0, 0.0);
 				if (evt.time() >= m_time1 && evt.time() >= m_time4 && m_state == 234){
 					this->stopRobotMove();
 					m_state = 141;
+					LOG_MSG(("m_state:%d\n", m_state));
 				}
 				break;
 	}
+
+	//デバッグ用
+	case 9140: {
+				  this->neutralizeArms(evt.time());
+				  m_state = 9141;
+				  LOG_MSG(("m_state:%d\n", m_state));
+				  sendMsg("VoiceReco_Service", "start");
+				  break;
+	}
+	case 9141: {
+
+				  RobotObj *m_robotObject = getRobotObj(myname());
+				  double angleJoint1 = m_robotObject->getJointAngle("RARM_JOINT1")*180.0 / (M_PI);
+				  double angleJoint4 = m_robotObject->getJointAngle("RARM_JOINT4")*180.0 / (M_PI);
+
+				  LOG_MSG(("\nm_time1:%4f JOINT1 angle:%4f\nm_time4:%4f JOINT4 angle:%4f\n", m_time1, angleJoint1, m_time4, angleJoint4));
+				  if (evt.time() >= m_time4 && m_state == 9141) m_robotObject->setJointVelocity("RARM_JOINT4", 0.0, 0.0);
+				  if (evt.time() >= m_time1 && m_state == 9141) m_robotObject->setJointVelocity("RARM_JOINT1", 0.0, 0.0);
+				  if (evt.time() >= m_time1 && evt.time() >= m_time4 && m_state == 9141){
+					  this->stopRobotMove();
+					  sendMsg("VoiceReco_Service", "please pass my hand");
+					  m_state = 9142;
+					  //m_state = 9161;
+					  //m_time = 6.0;
+
+					  LOG_MSG(("m_state:%d\n", m_state));
+				  }
+				  break;
+	}
+	case 9142: {
+				  if (m_grasp == false && m_release == false){
+					  //自分を取得
+					  RobotObj *m_robotObject = getRobotObj(myname());
+					  //自分の手のパーツを得ます
+					  CParts * parts = m_robotObject->getParts("RARM_LINK7");
+					  sendMsg("SIGViewer", m_graspObjectName);
+					  if (parts->graspObj(m_graspObjectName)){
+						  m_grasp = true;
+						  sendMsg("VoiceReco_Service", m_graspObjectName);
+						  m_state = 9161;
+						  m_time = evt.time() + 3.0;
+						  LOG_MSG(("m_state:%d\n", m_state));
+					  }
+				  }
+				  break;
+	}
+	case 9161: {
+				  if (evt.time() >= m_time && m_state == 9161){
+					  this->stopRobotMove();
+					  this->prepareThrowing(evt.time());
+
+					  m_state = 9165;
+					  LOG_MSG(("m_state:%d\n", m_state));
+				  }
+				  break;
+	}
+	case 9165: {
+				  RobotObj *m_robotObject = getRobotObj(myname());
+				  double angleJoint1 = m_robotObject->getJointAngle("RARM_JOINT1")*180.0 / (M_PI);
+				  double angleJoint4 = m_robotObject->getJointAngle("RARM_JOINT4")*180.0 / (M_PI);
+
+				  LOG_MSG(("\nm_time1:%4f JOINT1 angle:%4f\nm_time4:%4f JOINT4 angle:%4f\n", m_time1, angleJoint1, m_time4, angleJoint4));
+				  if (evt.time() >= m_time4 && m_state == 9165) m_robotObject->setJointVelocity("RARM_JOINT4", 0.0, 0.0);
+				  if (evt.time() >= m_time1 && m_state == 9165) m_robotObject->setJointVelocity("RARM_JOINT1", 0.0, 0.0);
+				  if (evt.time() >= m_time1 && evt.time() >= m_time4 && m_state == 9165){
+					  this->stopRobotMove();
+					  Vector3d l_tpos;
+					  this->recognizeObjectPosition(l_tpos, trashBoxName);
+					  double l_moveTime = rotateTowardObj(l_tpos);
+					  m_time = l_moveTime + evt.time();
+
+					  m_state = 9170;
+					  LOG_MSG(("m_state:%d\n", m_state));
+				  }
+				  break;
+	}
+
 	}
 
 	
@@ -372,6 +498,7 @@ void DemoRobotController::onRecvMsg(RecvMsgEvent &evt) {
 			sendMsg("SIGViewer", "Recognition Success!!");
 			error_count = 0;
 			m_state = 140;
+			LOG_MSG(("m_state:%d\n", m_state));
 		}
 		//else sendMsg("VoiceReco_Service", "Message is not accepted");
 	}
@@ -390,6 +517,7 @@ void DemoRobotController::onRecvMsg(RecvMsgEvent &evt) {
 			sendMsg("SIGViewer", "Recognition Success!!");
 			error_count = 0;
 			m_state = 150;
+			LOG_MSG(("m_state:%d\n", m_state));
 		}
 		else if (str == "trashbox_1"){
 			sendMsg("VoiceReco_Service", str);
@@ -398,6 +526,7 @@ void DemoRobotController::onRecvMsg(RecvMsgEvent &evt) {
 			sendMsg("SIGViewer", "Recognition Success!!");
 			error_count = 0;
 			m_state = 150;
+			LOG_MSG(("m_state:%d\n", m_state));
 		}
 		else if (str == "trashbox_2"){
 			sendMsg("VoiceReco_Service", str);
@@ -406,6 +535,7 @@ void DemoRobotController::onRecvMsg(RecvMsgEvent &evt) {
 			sendMsg("SIGViewer", "Recognition Success!!");
 			error_count = 0;
 			m_state = 150;
+			LOG_MSG(("m_state:%d\n", m_state));
 		}
 		else if (str == "wagon_0"){
 			sendMsg("VoiceReco_Service", str);
@@ -414,6 +544,7 @@ void DemoRobotController::onRecvMsg(RecvMsgEvent &evt) {
 			sendMsg("SIGViewer", "Recognition Success!!");
 			error_count = 0;
 			m_state = 150;
+			LOG_MSG(("m_state:%d\n", m_state));
 		}
 		//else sendMsg("VoiceReco_Service", "Message is not accepted");
 	}
@@ -458,6 +589,7 @@ void DemoRobotController::onCollision(CollisionEvent &evt) {
 
 
 void DemoRobotController::stopRobotMove(void) {
+	RobotObj *m_robotObject = getRobotObj(myname());
 	m_robotObject->setWheelVelocity(0.0, 0.0);
 }
 
@@ -473,6 +605,7 @@ void DemoRobotController::stopRobotArmMove(void) {
 double DemoRobotController::goToObj(Vector3d pos, double range) {
 	// get own position
 	Vector3d robotCurrentPosition;
+	RobotObj *m_robotObject = getRobotObj(myname());
 	//m_robotObject->getPosition(robotCurrentPosition);
 	m_robotObject->getPartsPosition(robotCurrentPosition,"RARM_LINK2");
 
@@ -499,7 +632,8 @@ double DemoRobotController::goToObj(Vector3d pos, double range) {
 double DemoRobotController::rotateTowardObj(Vector3d pos) {  // "pos" means target position
 	// get own position
 	Vector3d ownPosition;
-	m_robotObject->getPartsPosition(ownPosition,"RARM_LINK2");
+	RobotObj *m_robotObject = getRobotObj(myname());
+	m_robotObject->getPartsPosition(ownPosition, "RARM_LINK2");
 
 	// pointing vector for target
 	Vector3d l_pos = pos;
@@ -562,19 +696,55 @@ void DemoRobotController::recognizeObjectPosition(Vector3d &pos, std::string &na
 
 
 void DemoRobotController::prepareThrowing(double evt_time){
-	double thetaJoint1 = 50.0;
+	/*double thetaJoint1 = 50.0;
 	m_robotObject->setJointVelocity("RARM_JOINT1", -m_jointVelocity, 0.0);
 	m_time1 = DEG2RAD(abs(thetaJoint1))/ m_jointVelocity + evt_time;
 
 	double thetaJoint4 = 20.0;
 	m_robotObject->setJointVelocity("RARM_JOINT4", m_jointVelocity, 0.0);
-	m_time4 = DEG2RAD(abs(thetaJoint4))/ m_jointVelocity + evt_time;
+	m_time4 = DEG2RAD(abs(thetaJoint4))/ m_jointVelocity + evt_time;*/
 
+	//double angleJoint1 = m_robotObject->getJointAngle("RARM_JOINT1")*180.0 / (M_PI);
+	////LOG_MSG(("angleJoint1: %.1f\n", angleJoint1));
+	//double thetaJoint1 = 45.0;
+	////LOG_MSG(("thetaJoint1: %.1f\n", thetaJoint1));
+	////m_robotObject->setJointVelocity("RARM_JOINT1", -m_jointVelocity, 0.0);
+	//if (angleJoint1 < thetaJoint1) m_robotObject->setJointVelocity("RARM_JOINT1", -m_jointVelocity, 0.0);
+	//else m_robotObject->setJointVelocity("RARM_JOINT1", m_jointVelocity, 0.0);
+	//m_time1 = DEG2RAD(abs(thetaJoint1)) / m_jointVelocity + evt_time;
+
+	//double angleJoint4 = m_robotObject->getJointAngle("RARM_JOINT4")*180.0 / (M_PI);
+	////LOG_MSG(("angleJoint4: %.1f\n", angleJoint4));
+	//double thetaJoint4 = 70.0;
+	////LOG_MSG(("thetaJoint4: %.1f\n", thetaJoint4));
+	////m_robotObject->setJointVelocity("RARM_JOINT4", m_jointVelocity, 0.0);
+	//if (angleJoint4 > thetaJoint4) m_robotObject->setJointVelocity("RARM_JOINT4", -m_jointVelocity, 0.0);
+	//else m_robotObject->setJointVelocity("RARM_JOINT4", m_jointVelocity, 0.0);
+	//m_time4 = DEG2RAD(abs(thetaJoint4)) / m_jointVelocity + evt_time;
+	//LOG_MSG(("\nthetaJoint1:%f\nthetaJoint4:%f\n", thetaJoint1, thetaJoint4));
+
+	RobotObj *m_robotObject = getRobotObj(myname());
+	double angleJoint1 = m_robotObject->getJointAngle("RARM_JOINT1")*180.0 / (M_PI);
+	double angleJoint4 = m_robotObject->getJointAngle("RARM_JOINT4")*180.0 / (M_PI);
+	double thetaJoint1 = -60 - angleJoint1;
+	double thetaJoint4 = -25 - angleJoint4;
+	LOG_MSG(("\nthetaJoint1:%f\nthetaJoint4:%f\n", thetaJoint1, thetaJoint4));
+
+
+	if (thetaJoint4<0) m_robotObject->setJointVelocity("RARM_JOINT4", -m_jointVelocity, 0.0);
+	else m_robotObject->setJointVelocity("RARM_JOINT4", m_jointVelocity, 0.0);
+
+	if (thetaJoint1<0) m_robotObject->setJointVelocity("RARM_JOINT1", -m_jointVelocity, 0.0);
+	else m_robotObject->setJointVelocity("RARM_JOINT1", m_jointVelocity, 0.0);
+
+	m_time4 = DEG2RAD(abs(thetaJoint4)) / m_jointVelocity + evt_time;
+	m_time1 = DEG2RAD(abs(thetaJoint1)) / m_jointVelocity + evt_time;
 }
 
 
 void DemoRobotController::throwTrash(void){
 	// get the part info. 
+	RobotObj *m_robotObject = getRobotObj(myname());
 	CParts *parts = m_robotObject->getParts("RARM_LINK7");
 
 	// release grasping
@@ -593,6 +763,7 @@ double DemoRobotController::goGraspingObject(Vector3d &pos){
 	double l_time;
 	double thetaJoint4 = 20.0;
 
+	RobotObj *m_robotObject = getRobotObj(myname());
 	m_robotObject->setJointVelocity("RARM_JOINT4", m_jointVelocity, 0.0);
 
 	l_time = DEG2RAD(abs(thetaJoint4))/ m_jointVelocity;
@@ -602,10 +773,13 @@ double DemoRobotController::goGraspingObject(Vector3d &pos){
 
 
 void DemoRobotController::neutralizeArms(double evt_time){
-	double angleJoint1 = m_robotObject->getJointAngle("RARM_JOINT1")*180.0/(M_PI);
+	RobotObj *m_robotObject = getRobotObj(myname());
+	double angleJoint1 = m_robotObject->getJointAngle("RARM_JOINT1")*180.0 / (M_PI);
 	double angleJoint4 = m_robotObject->getJointAngle("RARM_JOINT4")*180.0/(M_PI);
-	double thetaJoint1 = -15 - angleJoint1;
-	double thetaJoint4 = -110 - angleJoint4;
+	double thetaJoint1 = -40 - angleJoint1;
+	double thetaJoint4 = -80 - angleJoint4;
+	LOG_MSG(("\nthetaJoint1:%f\nthetaJoint4:%f\n", thetaJoint1, thetaJoint4));
+
 
 	if(thetaJoint4<0) m_robotObject->setJointVelocity("RARM_JOINT4", -m_jointVelocity, 0.0);
 	else m_robotObject->setJointVelocity("RARM_JOINT4", m_jointVelocity, 0.0);
@@ -613,8 +787,9 @@ void DemoRobotController::neutralizeArms(double evt_time){
 	if(thetaJoint1<0) m_robotObject->setJointVelocity("RARM_JOINT1", -m_jointVelocity, 0.0);
 	else m_robotObject->setJointVelocity("RARM_JOINT1", m_jointVelocity, 0.0);
 
+	m_time4 = DEG2RAD(abs(thetaJoint4)) / m_jointVelocity + evt_time;
 	m_time1 = DEG2RAD(abs(thetaJoint1))/ m_jointVelocity + evt_time;
-	m_time4 = DEG2RAD(abs(thetaJoint4))/ m_jointVelocity + evt_time;
+	
 }
 
 
