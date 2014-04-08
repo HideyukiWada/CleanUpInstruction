@@ -15,6 +15,9 @@ service\SIGNIUserTracker\Samples\Bin\Release
 VoiceControll
 service\VoiceControll\Debug
 
+MemorizeStorageSpace
+\service\MemorizeStorageSpace\Debug
+
 
 
 
