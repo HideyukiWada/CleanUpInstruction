@@ -97,6 +97,7 @@ double MemorizeStorageSpace::onAction()
 {
 	if (recieveObject && recieceStorageSpace){
 		incrementCleanUpCount();
+		writeList();
 	}
 
 	return 0.1;
