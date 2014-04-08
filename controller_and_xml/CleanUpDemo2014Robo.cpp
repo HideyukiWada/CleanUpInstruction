@@ -187,6 +187,11 @@ double DemoRobotController::onAction(ActionEvent &evt) {
 						sendMsg("VoiceReco_Service", m_graspObjectName);
 						m_state = 143;
 						LOG_MSG(("m_state:%d\n", m_state));
+
+						//運ぶ物体を対応表に記録
+						std::string msg = "object";
+						msg += " " + m_graspObjectName;
+						sendMsg("Memorize_Service", msg);
 					}
 				}
 				break;
@@ -291,6 +296,11 @@ double DemoRobotController::onAction(ActionEvent &evt) {
 				if (evt.time() >= m_time && m_state == 200){
 					this->stopRobotMove();
 					this->throwTrash();
+
+					//運び先を対応表に記録
+					std::string msg = "storageSpace";
+					msg += " " + trashBoxName;
+					sendMsg("Memorize_Service", msg);
 
 					sleep(1);
 
