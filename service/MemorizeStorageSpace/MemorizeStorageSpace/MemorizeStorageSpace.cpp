@@ -64,9 +64,9 @@ public:
 	int storageSpaceIndex;
 
 	//ï®ëÃñºÇéÛêMÇµÇΩÇ©
-	bool recieveObject;
+	bool receiveObject;
 	//â^Ç—êÊÇéÛêMÇµÇΩÇ©
-	bool recieceStorageSpace;
+	bool receiveStorageSpace;
 
 };
 
@@ -84,8 +84,8 @@ void MemorizeStorageSpace::onInit(){
 	robotName = "robot_000";
 	listName = "StorageSpaceList.txt";
 
-	recieveObject = false;
-	recieceStorageSpace = false;
+	receiveObject = false;
+	receiveStorageSpace = false;
 
 	readList();
 	
@@ -95,7 +95,7 @@ void MemorizeStorageSpace::onInit(){
 
 double MemorizeStorageSpace::onAction()
 {
-	if (recieveObject && recieceStorageSpace){
+	if (receiveObject && receiveStorageSpace){
 		incrementCleanUpCount();
 		writeList();
 	}
@@ -125,7 +125,7 @@ void MemorizeStorageSpace::onRecvMsg(sigverse::RecvMsgEvent &evt)
 		if (!findObject(m_objectName)){
 			addObject(m_objectName);
 		}
-		recieveObject = true;
+		receiveObject = true;
 	}
 	else if (headss == "storageSpace"){
 		m_storageSpaceName = tmpss;
@@ -133,7 +133,7 @@ void MemorizeStorageSpace::onRecvMsg(sigverse::RecvMsgEvent &evt)
 		if (!findStorageSpace(m_storageSpaceName)){
 			addStorageSpace(m_storageSpaceName);
 		}
-		recieceStorageSpace = true;
+		receiveStorageSpace = true;
 	}
 
 	printf("Message  : %s  \n", s.c_str());
@@ -259,7 +259,7 @@ void MemorizeStorageSpace::addObject(std::string objectName)
 */
 bool MemorizeStorageSpace::findStorageSpace(std::string storageSpaceName)
 {
-	for (int i = 0; i < cul[objectIndex].storageSpaceCount - 1; i++){
+	for (int i = 0; i < cul[objectIndex].storageSpaceCount; i++){
 		if (storageSpaceName == cul[objectIndex].storageSpaceName[i]){
 			storageSpaceIndex = i;
 			return true;
@@ -287,8 +287,8 @@ void MemorizeStorageSpace::addStorageSpace(std::string storageSpaceName)
 void MemorizeStorageSpace::incrementCleanUpCount()
 {
 	cul[objectIndex].cleanUpCount[storageSpaceIndex]++;
-	recieveObject = false;
-	recieceStorageSpace = false;
+	receiveObject = false;
+	receiveStorageSpace = false;
 }
 
 int main(int argc, char** argv)
