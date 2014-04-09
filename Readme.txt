@@ -27,7 +27,16 @@ MemorizeStorageSpace
 
 ====================================================================
 MemorizeStorageSpaceで使用する対応表"StorageSpaceList.txt"は
-\service\MemorizeStorageSpace\MemorizeStorageSpace内に作成されます．
+\service\MemorizeStorageSpace\Debug内に作成されます．
+
+対応表には
+objectName storageSpaceCount storageSpaceName1 cleanUpCount1 storageSpaceName2 cleanUpCount2 .....
+のように記述されます．
+
+objectName         運んだ物体の名前
+storageSpaceCount  運んだことがある場所が何箇所あるか
+storageSpaceName   運んだ場所の名前
+cleanUpCount       storageSpaceNameに片付けた回数
 ====================================================================
 
 
