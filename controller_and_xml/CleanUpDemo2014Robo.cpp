@@ -408,9 +408,9 @@ double DemoRobotController::onAction(ActionEvent &evt) {
 				  if (evt.time() >= m_time1 && evt.time() >= m_time4 && m_state == 9141){
 					  this->stopRobotMove();
 					  sendMsg("VoiceReco_Service", "please pass my hand");
-					  m_state = 9142;
-					  //m_state = 9161;
-					  //m_time = 6.0;
+					  //m_state = 9142;
+					  m_state = 9161;
+					  m_time = 6.0;
 
 					  LOG_MSG(("m_state:%d\n", m_state));
 				  }
@@ -458,7 +458,7 @@ double DemoRobotController::onAction(ActionEvent &evt) {
 					  double l_moveTime = rotateTowardObj(l_tpos);
 					  m_time = l_moveTime + evt.time();
 
-					  m_state = 9170;
+					  m_state = 9140;
 					  LOG_MSG(("m_state:%d\n", m_state));
 				  }
 				  break;
@@ -736,19 +736,21 @@ void DemoRobotController::prepareThrowing(double evt_time){
 	RobotObj *m_robotObject = getRobotObj(myname());
 	double angleJoint1 = m_robotObject->getJointAngle("RARM_JOINT1")*180.0 / (M_PI);
 	double angleJoint4 = m_robotObject->getJointAngle("RARM_JOINT4")*180.0 / (M_PI);
-	double thetaJoint1 = -60 - angleJoint1;
-	double thetaJoint4 = -25 - angleJoint4;
+	double thetaJoint1 = -50 - angleJoint1;
+	double thetaJoint4 = -60 - angleJoint4;
 	LOG_MSG(("\nthetaJoint1:%f\nthetaJoint4:%f\n", thetaJoint1, thetaJoint4));
 
 
-	if (thetaJoint4<0) m_robotObject->setJointVelocity("RARM_JOINT4", -m_jointVelocity, 0.0);
-	else m_robotObject->setJointVelocity("RARM_JOINT4", m_jointVelocity, 0.0);
+	
 
 	if (thetaJoint1<0) m_robotObject->setJointVelocity("RARM_JOINT1", -m_jointVelocity, 0.0);
 	else m_robotObject->setJointVelocity("RARM_JOINT1", m_jointVelocity, 0.0);
 
-	m_time4 = DEG2RAD(abs(thetaJoint4)) / m_jointVelocity + evt_time;
-	m_time1 = DEG2RAD(abs(thetaJoint1)) / m_jointVelocity + evt_time;
+	if (thetaJoint4<0) m_robotObject->setJointVelocity("RARM_JOINT4", -m_jointVelocity, 0.0);
+	else m_robotObject->setJointVelocity("RARM_JOINT4", m_jointVelocity, 0.0);
+
+	m_time4 = DEG2RAD(fabs(thetaJoint4)) / m_jointVelocity + evt_time;
+	m_time1 = DEG2RAD(fabs(thetaJoint1)) / m_jointVelocity + evt_time;
 }
 
 
@@ -786,8 +788,8 @@ void DemoRobotController::neutralizeArms(double evt_time){
 	RobotObj *m_robotObject = getRobotObj(myname());
 	double angleJoint1 = m_robotObject->getJointAngle("RARM_JOINT1")*180.0 / (M_PI);
 	double angleJoint4 = m_robotObject->getJointAngle("RARM_JOINT4")*180.0/(M_PI);
-	double thetaJoint1 = -40 - angleJoint1;
-	double thetaJoint4 = -80 - angleJoint4;
+	double thetaJoint1 = -50 - angleJoint1;
+	double thetaJoint4 = -70 - angleJoint4;
 	LOG_MSG(("\nthetaJoint1:%f\nthetaJoint4:%f\n", thetaJoint1, thetaJoint4));
 
 
@@ -797,8 +799,8 @@ void DemoRobotController::neutralizeArms(double evt_time){
 	if(thetaJoint1<0) m_robotObject->setJointVelocity("RARM_JOINT1", -m_jointVelocity, 0.0);
 	else m_robotObject->setJointVelocity("RARM_JOINT1", m_jointVelocity, 0.0);
 
-	m_time4 = DEG2RAD(abs(thetaJoint4)) / m_jointVelocity + evt_time;
-	m_time1 = DEG2RAD(abs(thetaJoint1))/ m_jointVelocity + evt_time;
+	m_time4 = DEG2RAD(fabs(thetaJoint4)) / m_jointVelocity + evt_time;
+	m_time1 = DEG2RAD(fabs(thetaJoint1))/ m_jointVelocity + evt_time;
 	
 }
 
