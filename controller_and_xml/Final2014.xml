@@ -17,47 +17,89 @@
             direction="0 0 1"
             position="0.0 0.0 5.0"/>
     <set-attr-value name="language" value="c++"/>
-    <set-attr-value name="implementation" value="./cleanUpUser.so"/>
+    <set-attr-value name="implementation" value="./Final2014User.so"/>
   </instanciate>
-
-  <instanciate class="WheelRobot-nii-v1.xml" type="Robot">
-    <set-attr-value name="name" value="robot_000"/>
+  
+    <instanciate class="sobit.xml" type="Robot">
+    <set-attr-value name="name" value="sobit"/>
     <set-attr-value name="language" value="c++"/>
     <set-attr-value name="implementation"
-                    value="./CleanUpDemo2014Robo.so"/>
+                    value="./Final2014Robo.so"/>
     <set-attr-value name="dynamics" value="false"/>
     <set-attr-value name="x" value="90.0"/>
-    <set-attr-value name="y" value="30.0"/>
+    <set-attr-value name="y" value="50.0"/>
     <set-attr-value name="z" value="30.0"/>
+    <set-attr-value name="scalex" value="0.74"/>
+    <set-attr-value name="scaley" value="0.74"/>
+    <set-attr-value name="scalez" value="0.74"/>
     <set-attr-value name="qw" value="0.707"/>
     <!--<set-attr-value name="qx" value="3"/>-->
     <set-attr-value name="qy" value="0.707"/>
     <!--<set-attr-value name="qz" value="2"/>-->
     <set-attr-value name="collision" value="true"/>
 
-    <!--stereo camera right-->
+    <!--stereo camera right--><!--
     <camera id="1"  
             link="REYE_LINK"  
             direction="0.0 0.0 1.0"  
             position="0.0 0.0 3.0"/>
-    <!--stereo camera left-->
+    --><!--stereo camera left--><!--
     <camera id="2"  
             link="LEYE_LINK"
             direction="0.0 0.0 1.0"  
             position="0.0 0.0 3.0"/>
-    <!--distance sensor-->
+    --><!--distance sensor--><!--
     <camera id="3"
             link="WAIST_LINK0"
             direction="0.0 0.0 1.0"
             position="0.0 -5.0 20.0"/>
-    <!--monitoring camera-->
+    --><!--monitoring camera--><!--
+    <camera id="4"  
+            link="WAIST_LINK2"  
+            direction="0 0 1"   
+            quaternion="0.0 0.0 -0.966 0.259"  
+            position="0.0 40.0 120.0"/>-->  
+
+  </instanciate>
+
+  <!--<instanciate class="WheelRobot-nii-v1.xml" type="Robot">
+    <set-attr-value name="name" value="robot_000"/>
+    <set-attr-value name="language" value="c++"/>
+    <set-attr-value name="implementation"
+                    value="./Final2014Robo.so"/>
+    <set-attr-value name="dynamics" value="false"/>
+    <set-attr-value name="x" value="90.0"/>
+    <set-attr-value name="y" value="30.0"/>
+    <set-attr-value name="z" value="30.0"/>
+    <set-attr-value name="qw" value="0.707"/>
+    --><!--<set-attr-value name="qx" value="3"/>--><!--
+    <set-attr-value name="qy" value="0.707"/>
+    --><!--<set-attr-value name="qz" value="2"/>--><!--
+    <set-attr-value name="collision" value="true"/>
+
+    --><!--stereo camera right--><!--
+    <camera id="1"  
+            link="REYE_LINK"  
+            direction="0.0 0.0 1.0"  
+            position="0.0 0.0 3.0"/>
+    --><!--stereo camera left--><!--
+    <camera id="2"  
+            link="LEYE_LINK"
+            direction="0.0 0.0 1.0"  
+            position="0.0 0.0 3.0"/>
+    --><!--distance sensor--><!--
+    <camera id="3"
+            link="WAIST_LINK0"
+            direction="0.0 0.0 1.0"
+            position="0.0 -5.0 20.0"/>
+    --><!--monitoring camera--><!--
     <camera id="4"  
             link="WAIST_LINK2"  
             direction="0 0 1"   
             quaternion="0.0 0.0 -0.966 0.259"  
             position="0.0 40.0 120.0"/>  
 
-  </instanciate>
+  </instanciate>-->
 
   <!--<instanciate class="seModerator.xml">
     <set-attr-value name="name" value="moderator_0"/>
@@ -74,7 +116,7 @@
 
 <!-- object -->
   <instanciate class="seClock.xml">  
-    <set-attr-value name="name" value="clock"/>  
+    <set-attr-value name="name" value="Clock"/>  
     <set-attr-value name="dynamics" value="false"/>
     <set-attr-value name="x" value="143.0"/>  
     <set-attr-value name="y" value="68.0"/>  
@@ -83,7 +125,7 @@
     <set-attr-value name="graspable" value="true"/>
   </instanciate>
   <instanciate class="seDoll_Bear.xml">  
-    <set-attr-value name="name" value="bear"/>  
+    <set-attr-value name="name" value="Bear"/>  
     <set-attr-value name="dynamics" value="false"/>
     <set-attr-value name="x" value="173.0"/>
     <set-attr-value name="y" value="73.600"/>
@@ -92,7 +134,7 @@
     <set-attr-value name="graspable" value="true"/>
   </instanciate>
   <instanciate class="seToy_D.xml">
-    <set-attr-value name="name" value="penguin"/>
+    <set-attr-value name="name" value="Penguin"/>
     <set-attr-value name="dynamics" value="false"/>
     <set-attr-value name="x" value="198.0"/>
     <set-attr-value name="y" value="70.0"/>
@@ -101,7 +143,7 @@
     <set-attr-value name="graspable" value="true"/>
   </instanciate>
   <instanciate class="seCup_c01.xml">
-    <set-attr-value name="name" value="cup"/>
+    <set-attr-value name="name" value="Cup"/>
     <set-attr-value name="dynamics" value="false"/>
     <set-attr-value name="x" value="223.0"/>
     <set-attr-value name="y" value="68.0"/>
@@ -132,7 +174,7 @@
     <set-attr-value name="graspable" value="true"/>
   </instanciate>
   <instanciate class="seCupboard_A_c02.xml">
-    <set-attr-value name="name" value="Cupboard"/>
+    <set-attr-value name="name" value="CupBoard"/>
     <set-attr-value name="dynamics" value="false"/>
     <set-attr-value name="x" value="100.0"/>  
     <set-attr-value name="y" value="86.35"/>  
@@ -147,7 +189,7 @@
     <set-attr-value name="name" value="BookShelf"/>
     <set-attr-value name="dynamics" value="false"/>
     <set-attr-value name="x" value="-70.0"/>  
-    <set-attr-value name="y" value="66.35"/>  
+    <set-attr-value name="y" value="70.5"/>  
     <set-attr-value name="z" value="-295.0"/>  
     <set-attr-value name="scalex" value="1.6"/>  
     <set-attr-value name="scaley" value="1.0"/>  
@@ -216,20 +258,28 @@
 		<set-attr-value name="collision" value="false"/>
   </instanciate>-->
   <instanciate class="A1_kitchen.xml">
-    <set-attr-value name="name" value="Kitchen1"/>
+    <set-attr-value name="name" value="Kitchen"/>
     <set-attr-value name="dynamics" value="false"/>
     <set-attr-value name="x" value="-373.0"/>
-    <set-attr-value name="y" value="114.696"/>
+    <set-attr-value name="y" value="84.696"/>
     <set-attr-value name="z" value="-235.5"/>
+    <set-attr-value name="scalex" value="1.0"/>  
+    <set-attr-value name="scaley" value="0.7"/>  
+    <set-attr-value name="scalez" value="1.0"/> 
     <set-attr-value name="graspable" value="false"/>
     <set-attr-value name="collision" value="true"/>
   </instanciate>
   <instanciate class="A1_kitchen_table.xml">
-    <set-attr-value name="name" value="Kitchen Table1"/>
+    <set-attr-value name="name" value="Table"/>
     <set-attr-value name="dynamics" value="false"/>
     <set-attr-value name="x" value="-300"/>
     <set-attr-value name="y" value="25.0"/>
-    <set-attr-value name="z" value="50.0"/>
+    <set-attr-value name="z" value="150.0"/>
+    <set-attr-value name="qw" value="0.707"/>
+    <!--<set-attr-value name="qx" value="3"/>-->
+    <set-attr-value name="qy" value="0.707"/>
+    <!--<set-attr-value name="qz" value="2"/>-->
+    <set-attr-value name="collision" value="true"/>
     <set-attr-value name="graspable" value="false"/>
     <set-attr-value name="collision" value="true"/>
   </instanciate>
@@ -246,15 +296,18 @@
     <set-attr-value name="name" value="Air cleaner1"/>
     <set-attr-value name="dynamics" value="false"/>
     <set-attr-value name="x" value="-375.546"/>
-    <set-attr-value name="y" value="184.955"/>
+    <set-attr-value name="y" value="139.955"/>
     <set-attr-value name="z" value="-300.694"/>
+    <set-attr-value name="scalex" value="1.0"/>  
+    <set-attr-value name="scaley" value="0.7"/>  
+    <set-attr-value name="scalez" value="1.0"/> 
     <set-attr-value name="graspable" value="false"/>
   </instanciate>
   <instanciate class="A1_gas_cooker.xml">
     <set-attr-value name="name" value="Gas cooker1"/>
     <set-attr-value name="dynamics" value="false"/>
     <set-attr-value name="x" value="-367.116"/>
-    <set-attr-value name="y" value="88.226"/>
+    <set-attr-value name="y" value="58.226"/>
     <set-attr-value name="z" value="-294.129"/>
     <set-attr-value name="graspable" value="false"/>
   </instanciate>
@@ -262,7 +315,7 @@
     <set-attr-value name="name" value="Kitchen sink1"/>
     <set-attr-value name="dynamics" value="false"/>
     <set-attr-value name="x" value="-468.951"/>
-    <set-attr-value name="y" value="89.030"/>
+    <set-attr-value name="y" value="59.030"/>
     <set-attr-value name="z" value="-208.245"/>
     <set-attr-value name="graspable" value="false"/>
   </instanciate>
@@ -304,7 +357,7 @@
     <set-attr-value name="graspable" value="false"/>
   </instanciate>-->  
   <instanciate class="seWagon_c02.xml">  
-    <set-attr-value name="name" value="wagon_0"/>  
+    <set-attr-value name="name" value="Wagon"/>  
     <set-attr-value name="dynamics" value="false"/>
     <set-attr-value name="scaley" value="0.7"/>
     <set-attr-value name="x" value="-200.0"/>  
