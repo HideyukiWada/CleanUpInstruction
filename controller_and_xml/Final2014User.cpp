@@ -15,7 +15,7 @@ class UserController : public Controller
 public:
 
 	void moveBodyByKINECT(char* msg);
-	void moveHeadByHMD(const std::string ss);
+	//void moveHeadByHMD(const std::string ss);
 	void onRecvMsg(RecvMsgEvent &evt);
 	void onInit(InitEvent &evt);
 	double onAction(ActionEvent &evt);
@@ -24,17 +24,21 @@ public:
 
 private:
 	RobotObj *m_robotObject;
-
 	std::string m_graspObjectName;
-	std::string storageSpaceName;
+	std::string m_trashName1;
+	std::string m_trashName2;
+	std::string m_trashName3;
 
-	std::vector<std::string> objectList;
+	std::vector<std::string> trashNames;
 
 	//移動速度
 	double vel;
 	ViewService *m_view;
 	BaseService *m_kinect;
+	BaseService *m_ors;
 	BaseService *m_hmd;
+
+	bool chk_srv;
 
 	//初期位置
 	double m_posx, m_posy, m_posz;
@@ -65,18 +69,18 @@ void UserController::onInit(InitEvent &evt)
 	m_robotObject = getRobotObj(myname());
 	robotName = "sobit";
 
-	objectList.push_back("Clock");
-	objectList.push_back("Bear");
-	objectList.push_back("Penguin");
-	objectList.push_back("Cup");
+	m_trashName1 = "petbottle_1";
+	m_trashName2 = "can_0";
+	m_trashName3 = "kettle";
 
-	//m_graspObjectName = m_trashName2;
+	trashNames.push_back(m_trashName1);
+	trashNames.push_back(m_trashName2);
+	trashNames.push_back(m_trashName3);
 
 
-	//m_kinect = connectToService("SIGKINECT");
-	//m_hmd = connectToService("SIGHMD");
 	m_kinect = NULL;
 	m_hmd = NULL;
+	m_ors = NULL;
 
 	vel = 10.0;
 	srand(time(NULL));
@@ -112,7 +116,13 @@ double UserController::onAction(ActionEvent &evt)
 
 	// サービスが使用可能か定期的にチェックする
 	bool av_kinect = checkService("SIGKINECT");
-	bool av_hmd = checkService("SIGHMD");
+	bool ch_kinect = checkService("SIGORS");
+	
+
+	if (ch_kinect /*&& !chk_srv*/) {
+		m_ors = connectToService("SIGORS");
+	}
+
 
 	// 使用可能
 	if(av_kinect && m_kinect == NULL){
@@ -122,16 +132,6 @@ double UserController::onAction(ActionEvent &evt)
 	}
 	else if (!av_kinect && m_kinect != NULL){
 	m_kinect = NULL;
-	}
-
-	// 使用可能
-	if(av_hmd && m_hmd == NULL){
-	// サービスに接続
-	m_hmd = connectToService("SIGHMD");
-
-	}
-	else if (!av_hmd && m_hmd != NULL){
-	m_hmd = NULL;
 	}
 
 	return 1.5;
@@ -159,9 +159,70 @@ void UserController::onRecvMsg(RecvMsgEvent &evt)
 
 	
 
-	if(headss == "HMD_DATA"){
-	//HMDデータによる頭部の動き反映
-	moveHeadByHMD(ss);
+	if (headss == "ORS_DATA") {
+		LOG_MSG(("%s",all_msg));
+		//  }
+		//  if(headss == "HMD_DATA"){
+
+		double yaw, pitch, roll;
+		strPos1 = strPos2 + 1;
+		tmpss = "";
+
+		strPos2 = ss.find(",", strPos1);
+		tmpss.assign(ss, strPos1, strPos2 - strPos1);
+		yaw = atof(tmpss.c_str());
+
+		strPos1 = strPos2 + 1;
+		strPos2 = ss.find(",", strPos1);
+		tmpss.assign(ss, strPos1, strPos2 - strPos1);
+		pitch = atof(tmpss.c_str());
+
+		strPos1 = strPos2 + 1;
+		strPos2 = ss.find(",", strPos1);
+		tmpss.assign(ss, strPos1, strPos2 - strPos1);
+		roll = atof(tmpss.c_str());
+
+		if (yaw == pyaw && pitch == ppitch && roll == proll)  return;
+		else {
+			pyaw = yaw;
+			ppitch = pitch;
+			proll = roll;
+		}
+
+		dQuaternion qyaw;
+		dQuaternion qpitch;
+		dQuaternion qroll;
+
+		qyaw[0] = cos(-yaw / 2.0);
+		qyaw[1] = 0.0;
+		qyaw[2] = sin(-yaw / 2.0);
+		qyaw[3] = 0.0;
+
+		qpitch[0] = cos(-pitch / 2.0);
+		qpitch[1] = sin(-pitch / 2.0);
+		qpitch[2] = 0.0;
+		qpitch[3] = 0.0;
+
+		qroll[0] = cos(-roll / 2.0);
+		qroll[1] = 0.0;
+		qroll[2] = 0.0;
+		qroll[3] = sin(-roll / 2.0);
+		dQuaternion tmpQ1;
+		dQuaternion tmpQ2;
+
+		dQMultiply0(tmpQ1, qyaw, qpitch);
+		dQMultiply0(tmpQ2, tmpQ1, qroll);
+
+		dQuaternion bodyQ;
+		bodyQ[0] = m_qw;
+		bodyQ[1] = m_qx;
+		bodyQ[2] = m_qy;
+		bodyQ[3] = m_qz;
+
+		dQuaternion tmpQ3;
+		dQMultiply1(tmpQ3, bodyQ, tmpQ2);
+
+		my->setJointQuaternion("HEAD_JOINT0", tmpQ3[0], tmpQ3[1], tmpQ3[2], tmpQ3[3]);
 	}
 	else if(headss == "KINECT_DATA"){
 	//KINECTデータによる頭部以外の体の動き反映
@@ -185,9 +246,9 @@ void UserController::onRecvMsg(RecvMsgEvent &evt)
 		this->throwTrash();
 		std::string msg = "release";
 		msg += " " + m_graspObjectName;
-		sendMsg(robotName, msg);
+		sendMsg("robot_000", msg);
 	}
-
+	
 
 
 
@@ -198,93 +259,93 @@ void UserController::onRecvMsg(RecvMsgEvent &evt)
 
 }
 
-void UserController::moveHeadByHMD(const std::string ss){
-
-	//自分自身の取得
-	SimObj *my = this->getObj(this->myname());
-
-	//ヘッダーの取り出し
-	int strPos1 = 0;
-	int strPos2;
-	std::string headss;
-	std::string tmpss;
-	strPos2 = ss.find(" ", strPos1);
-	headss.assign(ss, strPos1, strPos2-strPos1);
-
-	if(headss == "HMD_DATA"){
-
-	double yaw, pitch, roll;
-	strPos1 = strPos2+1;
-	tmpss = "";
-
-	strPos2 = ss.find(",", strPos1);
-	tmpss.assign(ss, strPos1, strPos2-strPos1);
-	yaw = atof(tmpss.c_str());
-
-	strPos1 = strPos2+1;
-	strPos2 = ss.find(",", strPos1);
-	tmpss.assign(ss, strPos1, strPos2-strPos1);
-	pitch = atof(tmpss.c_str());
-
-	strPos1 = strPos2+1;
-	strPos2 = ss.find(",", strPos1);
-	tmpss.assign(ss, strPos1, strPos2-strPos1);
-	roll = atof(tmpss.c_str());
-
-
-	// 前回送信したyaw pitch roll と同じ場合は送信しない
-	if(yaw == pyaw && pitch == ppitch && roll == proll)  return;
-	else {
-		pyaw = yaw;
-		ppitch = pitch;
-		proll = roll;
-	}
-
-	// yaw pitch roll をクオータニオンに変換
-	dQuaternion qyaw;
-	dQuaternion qpitch;
-	dQuaternion qroll;
-
-	qyaw[0] = cos(-yaw/2.0);
-	qyaw[1] = 0.0;
-	qyaw[2] = sin(-yaw/2.0);
-	qyaw[3] = 0.0;
-
-	qpitch[0] = cos(-pitch/2.0);
-	qpitch[1] = sin(-pitch/2.0);
-	qpitch[2] = 0.0;
-	qpitch[3] = 0.0;
-
-	qroll[0] = cos(-roll/2.0);
-	qroll[1] = 0.0;
-	qroll[2] = 0.0;
-	qroll[3] = sin(-roll/2.0);
-	dQuaternion tmpQ1;
-	dQuaternion tmpQ2;
-
-	// yaw pitch roll の順に回転
-	dQMultiply0(tmpQ1, qyaw, qpitch);
-	dQMultiply0(tmpQ2, tmpQ1, qroll);
-
-	// 体全体の回転
-	dQuaternion bodyQ;
-	bodyQ[0] = m_qw;
-	bodyQ[1] = m_qx;
-	bodyQ[2] = m_qy;
-	bodyQ[3] = m_qz;
-
-	// 体全体の回転との差分をとる
-	dQuaternion tmpQ3;
-	dQMultiply1(tmpQ3, bodyQ, tmpQ2);
-
-	// 回転角度が小さい場合は回転しない
-	double theta = 2*acos(tmpQ3[0]);
-	if(theta <= 0.001) return;
-
-	// 首の関節を回転する
-	my->setJointQuaternion("HEAD_JOINT0", tmpQ3[0], tmpQ3[1], tmpQ3[2], tmpQ3[3]);
-	}
-}
+//void UserController::moveHeadByHMD(const std::string ss){
+//
+//	//自分自身の取得
+//	SimObj *my = this->getObj(this->myname());
+//
+//	//ヘッダーの取り出し
+//	int strPos1 = 0;
+//	int strPos2;
+//	std::string headss;
+//	std::string tmpss;
+//	strPos2 = ss.find(" ", strPos1);
+//	headss.assign(ss, strPos1, strPos2-strPos1);
+//
+//	if(headss == "HMD_DATA"){
+//
+//	double yaw, pitch, roll;
+//	strPos1 = strPos2+1;
+//	tmpss = "";
+//
+//	strPos2 = ss.find(",", strPos1);
+//	tmpss.assign(ss, strPos1, strPos2-strPos1);
+//	yaw = atof(tmpss.c_str());
+//
+//	strPos1 = strPos2+1;
+//	strPos2 = ss.find(",", strPos1);
+//	tmpss.assign(ss, strPos1, strPos2-strPos1);
+//	pitch = atof(tmpss.c_str());
+//
+//	strPos1 = strPos2+1;
+//	strPos2 = ss.find(",", strPos1);
+//	tmpss.assign(ss, strPos1, strPos2-strPos1);
+//	roll = atof(tmpss.c_str());
+//
+//
+//	// 前回送信したyaw pitch roll と同じ場合は送信しない
+//	if(yaw == pyaw && pitch == ppitch && roll == proll)  return;
+//	else {
+//		pyaw = yaw;
+//		ppitch = pitch;
+//		proll = roll;
+//	}
+//
+//	// yaw pitch roll をクオータニオンに変換
+//	dQuaternion qyaw;
+//	dQuaternion qpitch;
+//	dQuaternion qroll;
+//
+//	qyaw[0] = cos(-yaw/2.0);
+//	qyaw[1] = 0.0;
+//	qyaw[2] = sin(-yaw/2.0);
+//	qyaw[3] = 0.0;
+//
+//	qpitch[0] = cos(-pitch/2.0);
+//	qpitch[1] = sin(-pitch/2.0);
+//	qpitch[2] = 0.0;
+//	qpitch[3] = 0.0;
+//
+//	qroll[0] = cos(-roll/2.0);
+//	qroll[1] = 0.0;
+//	qroll[2] = 0.0;
+//	qroll[3] = sin(-roll/2.0);
+//	dQuaternion tmpQ1;
+//	dQuaternion tmpQ2;
+//
+//	// yaw pitch roll の順に回転
+//	dQMultiply0(tmpQ1, qyaw, qpitch);
+//	dQMultiply0(tmpQ2, tmpQ1, qroll);
+//
+//	// 体全体の回転
+//	dQuaternion bodyQ;
+//	bodyQ[0] = m_qw;
+//	bodyQ[1] = m_qx;
+//	bodyQ[2] = m_qy;
+//	bodyQ[3] = m_qz;
+//
+//	// 体全体の回転との差分をとる
+//	dQuaternion tmpQ3;
+//	dQMultiply1(tmpQ3, bodyQ, tmpQ2);
+//
+//	// 回転角度が小さい場合は回転しない
+//	double theta = 2*acos(tmpQ3[0]);
+//	if(theta <= 0.001) return;
+//
+//	// 首の関節を回転する
+//	my->setJointQuaternion("HEAD_JOINT0", tmpQ3[0], tmpQ3[1], tmpQ3[2], tmpQ3[3]);
+//	}
+//}
 
 
 void UserController::moveBodyByKINECT(char* all_msg){
@@ -376,8 +437,8 @@ void UserController::onCollision(CollisionEvent &evt) {
 
 		//　衝突したエンティティでループします
 		for (int i = 0; i < with.size(); i++){
-			for (int j = 0; j < objectList.size(); j++){
-				if (objectList[j] == with[i]){
+			for (int j = 0; j < trashNames.size(); j++){
+				if (trashNames[j] == with[i]){
 					//右手に衝突した場合
 					if (mparts[i] == "RARM_LINK7"){
 						//自分を取得
@@ -386,7 +447,7 @@ void UserController::onCollision(CollisionEvent &evt) {
 						CParts * parts = my->getParts("RARM_LINK7");
 						if (parts->graspObj(with[i])){
 							m_grasp = true;
-							m_graspObjectName = objectList[j];
+							m_graspObjectName = trashNames[j];
 						}
 					}
 				}
@@ -403,14 +464,14 @@ void UserController::onCollision(CollisionEvent &evt) {
 
 		//衝突したエンティティでループします
 		for (int i = 0; i < with.size(); i++){
-			if (with[i] == robotName){
+			if (with[i] == "robot_000"){
 				//ロボットの右手に衝突した場合
 				if (wparts[i] == "RARM_LINK7"){
 					if (mparts[i] == "RARM_LINK7"){
 						this->throwTrash();
 						std::string msg = "release";
 						msg += " " + m_graspObjectName;
-						sendMsg(robotName, msg);
+						sendMsg("robot_000", msg);
 					}
 				}
 			}

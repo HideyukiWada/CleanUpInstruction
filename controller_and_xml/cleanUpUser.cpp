@@ -24,12 +24,11 @@ public:
 
 private:
 	RobotObj *m_robotObject;
-	std::string m_graspObjectName;
-	std::string m_trashName1;
-	std::string m_trashName2;
-	std::string m_trashName3;
 
-	std::vector<std::string> trashNames;
+	std::string m_graspObjectName;
+	std::string storageSpaceName;
+
+	std::vector<std::string> objectList;
 
 	//移動速度
 	double vel;
@@ -64,15 +63,12 @@ private:
 void UserController::onInit(InitEvent &evt)
 {
 	m_robotObject = getRobotObj(myname());
-	robotName = "Robot";
+	robotName = "sobit";
 
-	m_trashName1 = "petbottle_1";
-	m_trashName2 = "can_0";
-	m_trashName3 = "kettle";
-
-	trashNames.push_back(m_trashName1);
-	trashNames.push_back(m_trashName2);
-	trashNames.push_back(m_trashName3);
+	objectList.push_back("Clock");
+	objectList.push_back("Bear");
+	objectList.push_back("Penguin");
+	objectList.push_back("Cup");
 
 	//m_graspObjectName = m_trashName2;
 
@@ -189,7 +185,7 @@ void UserController::onRecvMsg(RecvMsgEvent &evt)
 		this->throwTrash();
 		std::string msg = "release";
 		msg += " " + m_graspObjectName;
-		sendMsg("robot_000", msg);
+		sendMsg(robotName, msg);
 	}
 
 
@@ -380,8 +376,8 @@ void UserController::onCollision(CollisionEvent &evt) {
 
 		//　衝突したエンティティでループします
 		for (int i = 0; i < with.size(); i++){
-			for (int j = 0; j < trashNames.size(); j++){
-				if (trashNames[j] == with[i]){
+			for (int j = 0; j < objectList.size(); j++){
+				if (objectList[j] == with[i]){
 					//右手に衝突した場合
 					if (mparts[i] == "RARM_LINK7"){
 						//自分を取得
@@ -390,7 +386,7 @@ void UserController::onCollision(CollisionEvent &evt) {
 						CParts * parts = my->getParts("RARM_LINK7");
 						if (parts->graspObj(with[i])){
 							m_grasp = true;
-							m_graspObjectName = trashNames[j];
+							m_graspObjectName = objectList[j];
 						}
 					}
 				}
@@ -407,14 +403,14 @@ void UserController::onCollision(CollisionEvent &evt) {
 
 		//衝突したエンティティでループします
 		for (int i = 0; i < with.size(); i++){
-			if (with[i] == "robot_000"){
+			if (with[i] == robotName){
 				//ロボットの右手に衝突した場合
 				if (wparts[i] == "RARM_LINK7"){
 					if (mparts[i] == "RARM_LINK7"){
 						this->throwTrash();
 						std::string msg = "release";
 						msg += " " + m_graspObjectName;
-						sendMsg("robot_000", msg);
+						sendMsg(robotName, msg);
 					}
 				}
 			}
