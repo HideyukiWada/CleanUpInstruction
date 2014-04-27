@@ -112,6 +112,7 @@ void DemoRobotController::onInit(InitEvent &evt) {
 	m_time1 = 0.0;
 	m_time4 = 0.0;
 
+	//m_state = 0;
 	m_state = 100;  // switch of initial behavior
 	//m_state = 9140;
 
@@ -169,9 +170,9 @@ void DemoRobotController::onInit(InitEvent &evt) {
 	error_count = 0;
 
 	//デバッグ用
-	frontStorageSpace = m_frontStorageSpace3;
-	storageSpaceName = storageSpaceName3;
-	throwPosition = m_throwPosition3;
+	//frontStorageSpace = m_frontStorageSpace3;
+	//storageSpaceName = storageSpaceName3;
+	//throwPosition = m_throwPosition3;
 	stopMargin = 0.0;
 }
 
@@ -243,8 +244,8 @@ double DemoRobotController::onAction(ActionEvent &evt) {
 					this->stopRobotMove();
 					sendMsg("VoiceReco_Service", "please choose the trashbox");
 					
-					//m_state = 320;
-					m_state = 400;	//デバッグ用 発話対機をスキップ
+					m_state = 320;
+					//m_state = 400;	//デバッグ用 発話対機をスキップ
 
 					LOG_MSG(("m_state:%d\n", m_state));
 				}
@@ -477,6 +478,7 @@ void DemoRobotController::onRecvMsg(RecvMsgEvent &evt) {
 			sendMsg("VoiceReco_Service", str);
 			storageSpaceName = str;
 			frontStorageSpace = m_frontStorageSpace0;
+			throwPosition = m_throwPosition0;
 			sendMsg("SIGViewer", "Recognition Success!!");
 			error_count = 0;
 			m_state = 400;
@@ -486,6 +488,7 @@ void DemoRobotController::onRecvMsg(RecvMsgEvent &evt) {
 			sendMsg("VoiceReco_Service", str);
 			storageSpaceName = str;
 			frontStorageSpace = m_frontStorageSpace1;
+			throwPosition = m_throwPosition1;
 			sendMsg("SIGViewer", "Recognition Success!!");
 			error_count = 0;
 			m_state = 400;
@@ -495,6 +498,7 @@ void DemoRobotController::onRecvMsg(RecvMsgEvent &evt) {
 			sendMsg("VoiceReco_Service", str);
 			storageSpaceName = str;
 			frontStorageSpace = m_frontStorageSpace2;
+			throwPosition = m_throwPosition2;
 			sendMsg("SIGViewer", "Recognition Success!!");
 			error_count = 0;
 			m_state = 400;
@@ -504,6 +508,7 @@ void DemoRobotController::onRecvMsg(RecvMsgEvent &evt) {
 			sendMsg("VoiceReco_Service", str);
 			storageSpaceName = str;
 			frontStorageSpace = m_frontStorageSpace3;
+			throwPosition = m_throwPosition0;
 			sendMsg("SIGViewer", "Recognition Success!!");
 			error_count = 0;
 			m_state = 400;
@@ -513,6 +518,7 @@ void DemoRobotController::onRecvMsg(RecvMsgEvent &evt) {
 			sendMsg("VoiceReco_Service", str);
 			storageSpaceName = str;
 			frontStorageSpace = m_frontStorageSpace4;
+			throwPosition = m_throwPosition4;
 			sendMsg("SIGViewer", "Recognition Success!!");
 			error_count = 0;
 			m_state = 400;
@@ -522,6 +528,7 @@ void DemoRobotController::onRecvMsg(RecvMsgEvent &evt) {
 			sendMsg("VoiceReco_Service", str);
 			storageSpaceName = str;
 			frontStorageSpace = m_frontStorageSpace5;
+			throwPosition = m_throwPosition5;
 			sendMsg("SIGViewer", "Recognition Success!!");
 			error_count = 0;
 			m_state = 400;
