@@ -109,29 +109,28 @@ VoiceRecognition::~VoiceRecognition()
 std::string VoiceRecognition::japaneseMessage2englishMessage(std::string japaneseMessage){
 	std::string ja_str = japaneseMessage;
 	std::string en_str;
-	int pos = 0;
 
 	//クリーンナップ開始
-	if (pos != ja_str.find("片づけ")) en_str = "go";
+	if (std::string::npos != ja_str.find("片づけ")) en_str = "go";
 	else if (ja_str == "始めます") en_str = "go";
 
 	//把持対象の指定
-	else if (pos != ja_str.find("テーブル")) en_str = storageSpaceName0;
+	else if (std::string::npos != ja_str.find("テーブル")) en_str = storageSpaceName0;
 	//else if (ja_str == "これをとって") en_str = "take";
 
 	//捨てるor置く対象の指定
-	else if (pos != ja_str.find("キッチン")) en_str = storageSpaceName1;
+	else if (std::string::npos != ja_str.find("キッチン")) en_str = storageSpaceName1;
 	//else if (ja_str == "これに捨てて") en_str = "put";
 	//else if (ja_str == "そこに捨てて") en_str = "put";
 	
-	else if (pos != ja_str.find("ワゴン")) en_str = storageSpaceName2;
+	else if (std::string::npos != ja_str.find("ワゴン")) en_str = storageSpaceName2;
 
-	else if (pos != ja_str.find("棚") && pos != ja_str.find("本")) en_str = storageSpaceName3;
+	else if (std::string::npos != ja_str.find("棚") && std::string::npos != ja_str.find("本")) en_str = storageSpaceName3;
 	//else if (ja_str == "ここにおいて") en_str = "put";
 
-	else if (pos != ja_str.find("棚") && pos != ja_str.find("食器")) en_str = storageSpaceName4;
+	else if (std::string::npos != ja_str.find("棚") && std::string::npos != ja_str.find("食器")) en_str = storageSpaceName4;
 
-	else if (pos != ja_str.find("棚")) en_str = storageSpaceName5;
+	else if (std::string::npos != ja_str.find("棚")) en_str = storageSpaceName5;
 
 	//捨てるor置く対象を間違った場合やり直す
 	else if (ja_str == "終わります") en_str = "finish";	
@@ -165,20 +164,25 @@ std::string VoiceRecognition::englishMessage2japaneseMessage(std::string english
 	{
 		ja_str = "持っていく先を教えてください";
 	}
-	else if (en_str == "petbottle_1") 
+	else if (en_str == "Clock") 
 	{
-		m_pointedObject = "ペットボトル";
-		ja_str = m_pointedObject + "、を捨てます";
-	}
-	else if (en_str == "kettle") 
-	{
-		m_pointedObject = "ケトル";
+		m_pointedObject = "時計";
 		ja_str = m_pointedObject + "、を置きます";
 	}
-	else if (en_str == "can_0")
+	else if (en_str == "Bear") 
 	{
-		m_pointedObject = "缶";
-		ja_str = "、" +m_pointedObject + "、を捨てます";
+		m_pointedObject = "熊のぬいぐるみ";
+		ja_str = m_pointedObject + "、を置きます";
+	}
+	else if (en_str == "Penguin")
+	{
+		m_pointedObject = "おもちゃのペンギン";
+		ja_str = "、" +m_pointedObject + "、を置きます";
+	}
+	else if (en_str == "Cup")
+	{
+		m_pointedObject = "カップ";
+		ja_str = "、" + m_pointedObject + "、を置きます";
 	}
 	else if (en_str == "finish")
 	{
@@ -188,24 +192,34 @@ std::string VoiceRecognition::englishMessage2japaneseMessage(std::string english
 	{
 		ja_str = m_pointedObject + "、を運ぶ先を教えて下さい";
 	}
-	else if (en_str == "trashbox_0")
+	else if (en_str == storageSpaceName0)
 	{
-		m_pointedtrash = "リサイクル";
-		ja_str = "分かりました、" + m_pointedObject + "を、" + m_pointedtrash + "、に捨てに行きます";
+		m_pointedtrash = storageSpaceName0;
+		ja_str = "分かりました、" + m_pointedObject + "を、" + m_pointedtrash + "、に置きに行きます";
 	}
-	else if (en_str == "trashbox_1")
+	else if (en_str == storageSpaceName1)
 	{
-		m_pointedtrash = "燃えるゴミ";
-		ja_str = "分かりました、" + m_pointedObject + "を、" + m_pointedtrash + "、に捨てに行きます";
+		m_pointedtrash = storageSpaceName1;
+		ja_str = "分かりました、" + m_pointedObject + "を、" + m_pointedtrash + "、に置きに行きます";
 	}
-	else if (en_str == "trashbox_2")
+	else if (en_str == storageSpaceName2)
 	{
-		m_pointedtrash = "瓶・缶";
-		ja_str = "分かりました、" + m_pointedObject + "を、" + m_pointedtrash + "、に捨てに行きます";
+		m_pointedtrash = storageSpaceName2;
+		ja_str = "分かりました、" + m_pointedObject + "を、" + m_pointedtrash + "、に置きに行きます";
 	}
-	else if (en_str == "wagon_0")
+	else if (en_str == storageSpaceName3)
 	{
-		m_pointedtrash = "ワゴン";
+		m_pointedtrash = storageSpaceName3;
+		ja_str = "分かりました、" + m_pointedObject + "を、" + m_pointedtrash + "、に置きに行きます";
+	}
+	else if (en_str == storageSpaceName4)
+	{
+		m_pointedtrash = storageSpaceName4;
+		ja_str = "分かりました、" + m_pointedObject + "を、" + m_pointedtrash + "、に置きに行きます";
+	}
+	else if (en_str == storageSpaceName5)
+	{
+		m_pointedtrash = storageSpaceName5;
 		ja_str = "分かりました、" + m_pointedObject + "を、" + m_pointedtrash + "、に置きに行きます";
 	}
 	return ja_str;
