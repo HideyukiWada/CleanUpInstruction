@@ -420,152 +420,8 @@ double DemoRobotController::onAction(ActionEvent &evt) {
 				  }
 				  break;
 	}
-	//case 230: {
-	//			  //RobotObj *m_robotObject = getRobotObj(myname());
-	//			  double angleJoint1 = m_robotObject->getJointAngle("RARM_JOINT0")*180.0 / (M_PI);
-	//			  double angleJoint4 = m_robotObject->getJointAngle("RARM_JOINT3")*180.0 / (M_PI);
-
-	//			  LOG_MSG(("\nm_time1:%4f JOINT1 angle:%4f\nm_time4:%4f JOINT4 angle:%4f\n", m_time1, angleJoint1, m_time4, angleJoint4));
-
-	//			if (evt.time() >= m_time4 && m_state == 230) m_robotObject->setJointVelocity("RARM_JOINT3", 0.0, 0.0);
-	//			if (evt.time() >= m_time1 && m_state == 230) m_robotObject->setJointVelocity("RARM_JOINT0", 0.0, 0.0);
-	//			if (evt.time() >= m_time1 && evt.time() >= m_time4 && m_state == 230){
-	//				double l_moveTime = rotateTowardObj(m_waitPosition);
-
-	//				m_time = l_moveTime + evt.time();
-	//				m_state = 231;
-	//				LOG_MSG(("m_state:%d\n", m_state));
-	//			}
-	//			break;
-	//}
-	//case 231: {
-	//			if (evt.time() >= m_time && m_state == 231){
-	//				this->stopRobotMove();
-	//				double l_moveTime = goToObj(m_waitPosition, 0.0);
-	//				m_time = l_moveTime + evt.time();
-	//				m_state = 232;
-	//				LOG_MSG(("m_state:%d\n", m_state));
-	//			}
-	//			break;
-	//}
-	//case 232: {
-	//			if (evt.time() >= m_time && m_state == 232){
-	//				double l_moveTime = rotateTowardObj(m_userPosition);
-
-	//				m_time = l_moveTime + evt.time();
-	//				m_state = 233;
-	//				LOG_MSG(("m_state:%d\n", m_state));
-	//			}
-	//			break;
-	//}
-	//case 233: {
-	//			if (evt.time() >= m_time && m_state == 233){
-	//				this->stopRobotMove();
-	//				this->neutralizeArms(evt.time());
-
-	//				m_state = 141;
-	//				LOG_MSG(("m_state:%d\n", m_state));
-	//			}
-	//			break;
-	//}
-	//case 234: {
-	//			  //RobotObj *m_robotObject = getRobotObj(myname());
-	//			  double angleJoint1 = m_robotObject->getJointAngle("RARM_JOINT0")*180.0 / (M_PI);
-	//			  double angleJoint4 = m_robotObject->getJointAngle("RARM_JOINT3")*180.0 / (M_PI);
-
-	//			  LOG_MSG(("\nm_time1:%4f JOINT1 angle:%4f\nm_time4:%4f JOINT4 angle:%4f\n", m_time1, angleJoint1, m_time4, angleJoint4));
-
-	//			if (evt.time() >= m_time4 && m_state == 234) m_robotObject->setJointVelocity("RARM_JOINT3", 0.0, 0.0);
-	//			if (evt.time() >= m_time1 && m_state == 234) m_robotObject->setJointVelocity("RARM_JOINT0", 0.0, 0.0);
-	//			if (evt.time() >= m_time1 && evt.time() >= m_time4 && m_state == 234){
-	//				this->stopRobotMove();
-	//				m_state = 141;
-	//				LOG_MSG(("m_state:%d\n", m_state));
-	//			}
-	//			break;
-	//}
-
-	////デバッグ用
-	//case 9140: {
-	//			  this->neutralizeArms(evt.time());
-	//			  m_state = 9141;
-	//			  LOG_MSG(("m_state:%d\n", m_state));
-	//			  sendMsg("VoiceReco_Service", "start");
-	//			  break;
-	//}
-	//case 9141: {
-
-	//			  //RobotObj *m_robotObject = getRobotObj(myname());
-	//			  double angleJoint1 = m_robotObject->getJointAngle("RARM_JOINT0")*180.0 / (M_PI);
-	//			  double angleJoint4 = m_robotObject->getJointAngle("RARM_JOINT3")*180.0 / (M_PI);
-
-	//			  LOG_MSG(("\nm_time1:%4f JOINT1 angle:%4f\nm_time4:%4f JOINT4 angle:%4f\n", m_time1, angleJoint1, m_time4, angleJoint4));
-	//			  if (evt.time() >= m_time4 && m_state == 9141) m_robotObject->setJointVelocity("RARM_JOINT3", 0.0, 0.0);
-	//			  if (evt.time() >= m_time1 && m_state == 9141) m_robotObject->setJointVelocity("RARM_JOINT0", 0.0, 0.0);
-	//			  if (evt.time() >= m_time1 && evt.time() >= m_time4 && m_state == 9141){
-	//				  this->stopRobotMove();
-	//				  sendMsg("VoiceReco_Service", "please pass my hand");
-	//				  //m_state = 9142;
-	//				  m_state = 9161;
-	//				  m_time = 6.0;
-
-	//				  LOG_MSG(("m_state:%d\n", m_state));
-	//			  }
-	//			  break;
-	//}
-	//case 9142: {
-	//			  if (m_grasp == false && m_release == false){
-	//				  //自分を取得
-	//				  //RobotObj *m_robotObject = getRobotObj(myname());
-	//				  //自分の手のパーツを得ます
-	//				  CParts * parts = m_robotObject->getParts("RARM_LINK7");
-	//				  sendMsg("SIGViewer", m_graspObjectName);
-	//				  if (parts->graspObj(m_graspObjectName)){
-	//					  m_grasp = true;
-	//					  sendMsg("VoiceReco_Service", m_graspObjectName);
-	//					  m_state = 9161;
-	//					  m_time = evt.time() + 3.0;
-	//					  LOG_MSG(("m_state:%d\n", m_state));
-	//				  }
-	//			  }
-	//			  break;
-	//}
-	//case 9161: {
-	//			  if (evt.time() >= m_time && m_state == 9161){
-	//				  this->stopRobotMove();
-	//				  this->prepareThrowing(evt.time());
-
-	//				  m_state = 9165;
-	//				  LOG_MSG(("m_state:%d\n", m_state));
-	//			  }
-	//			  break;
-	//}
-	//case 9165: {
-	//			  //RobotObj *m_robotObject = getRobotObj(myname());
-	//			  double angleJoint1 = m_robotObject->getJointAngle("RARM_JOINT0")*180.0 / (M_PI);
-	//			  double angleJoint4 = m_robotObject->getJointAngle("RARM_JOINT3")*180.0 / (M_PI);
-
-	//			  LOG_MSG(("\nm_time1:%4f JOINT1 angle:%4f\nm_time4:%4f JOINT4 angle:%4f\n", m_time1, angleJoint1, m_time4, angleJoint4));
-	//			  if (evt.time() >= m_time4 && m_state == 9165) m_robotObject->setJointVelocity("RARM_JOINT3", 0.0, 0.0);
-	//			  if (evt.time() >= m_time1 && m_state == 9165) m_robotObject->setJointVelocity("RARM_JOINT0", 0.0, 0.0);
-	//			  if (evt.time() >= m_time1 && evt.time() >= m_time4 && m_state == 9165){
-	//				  this->stopRobotMove();
-	//				  Vector3d l_tpos;
-	//				  this->recognizeObjectPosition(l_tpos, trashBoxName);
-	//				  double l_moveTime = rotateTowardObj(l_tpos);
-	//				  m_time = l_moveTime + evt.time();
-
-	//				  m_state = 9140;
-	//				  LOG_MSG(("m_state:%d\n", m_state));
-	//			  }
-	//			  break;
-	//}
 
 	}
-
-	
-
-
 	return refreshRateOnAction;
 }
 
@@ -604,12 +460,12 @@ void DemoRobotController::onRecvMsg(RecvMsgEvent &evt) {
 		else if (str == "go"){
 			sendMsg("SIGViewer", "Recognition Success!!");
 			error_count = 0;
-			m_state = 140;
+			m_state = 100;
 			LOG_MSG(("m_state:%d\n", m_state));
 		}
 		//else sendMsg("VoiceReco_Service", "Message is not accepted");
 	}
-	else if (m_state == 145){
+	else if (m_state == 320){
 		if (str == "error"){
 			error_count++;
 			ss << error_count << ":Recognition Failure!!";
@@ -623,7 +479,7 @@ void DemoRobotController::onRecvMsg(RecvMsgEvent &evt) {
 			frontStorageSpace = m_frontStorageSpace0;
 			sendMsg("SIGViewer", "Recognition Success!!");
 			error_count = 0;
-			m_state = 150;
+			m_state = 400;
 			LOG_MSG(("m_state:%d\n", m_state));
 		}
 		else if (str == storageSpaceName1){
@@ -632,7 +488,7 @@ void DemoRobotController::onRecvMsg(RecvMsgEvent &evt) {
 			frontStorageSpace = m_frontStorageSpace1;
 			sendMsg("SIGViewer", "Recognition Success!!");
 			error_count = 0;
-			m_state = 150;
+			m_state = 400;
 			LOG_MSG(("m_state:%d\n", m_state));
 		}
 		else if (str == storageSpaceName2){
@@ -641,7 +497,7 @@ void DemoRobotController::onRecvMsg(RecvMsgEvent &evt) {
 			frontStorageSpace = m_frontStorageSpace2;
 			sendMsg("SIGViewer", "Recognition Success!!");
 			error_count = 0;
-			m_state = 150;
+			m_state = 400;
 			LOG_MSG(("m_state:%d\n", m_state));
 		}
 		else if (str == storageSpaceName3){
@@ -650,7 +506,7 @@ void DemoRobotController::onRecvMsg(RecvMsgEvent &evt) {
 			frontStorageSpace = m_frontStorageSpace3;
 			sendMsg("SIGViewer", "Recognition Success!!");
 			error_count = 0;
-			m_state = 150;
+			m_state = 400;
 			LOG_MSG(("m_state:%d\n", m_state));
 		}
 		else if (str == storageSpaceName4){
@@ -659,7 +515,7 @@ void DemoRobotController::onRecvMsg(RecvMsgEvent &evt) {
 			frontStorageSpace = m_frontStorageSpace4;
 			sendMsg("SIGViewer", "Recognition Success!!");
 			error_count = 0;
-			m_state = 150;
+			m_state = 400;
 			LOG_MSG(("m_state:%d\n", m_state));
 		}
 		else if (str == storageSpaceName5){
@@ -668,7 +524,7 @@ void DemoRobotController::onRecvMsg(RecvMsgEvent &evt) {
 			frontStorageSpace = m_frontStorageSpace5;
 			sendMsg("SIGViewer", "Recognition Success!!");
 			error_count = 0;
-			m_state = 150;
+			m_state = 400;
 			LOG_MSG(("m_state:%d\n", m_state));
 		}
 		//else sendMsg("VoiceReco_Service", "Message is not accepted");
