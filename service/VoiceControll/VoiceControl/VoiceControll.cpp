@@ -87,6 +87,13 @@ public:
 	std::string m_pointedObject;
 	std::string m_pointedtrash;
 	std::string robotName;
+
+	std::string storageSpaceName0;	//テーブル
+	std::string storageSpaceName1;	//キッチン
+	std::string storageSpaceName2;	//ワゴン
+	std::string storageSpaceName3;	//本棚
+	std::string storageSpaceName4;	//食器棚
+	std::string storageSpaceName5;	//棚
 };
 
 VoiceRecognition::~VoiceRecognition()
@@ -102,37 +109,29 @@ VoiceRecognition::~VoiceRecognition()
 std::string VoiceRecognition::japaneseMessage2englishMessage(std::string japaneseMessage){
 	std::string ja_str = japaneseMessage;
 	std::string en_str;
+	int pos = 0;
 
 	//クリーンナップ開始
-	if (ja_str == "片づけます") en_str = "go";
+	if (pos != ja_str.find("片づけ")) en_str = "go";
 	else if (ja_str == "始めます") en_str = "go";
 
 	//把持対象の指定
-	else if (ja_str == "緑色のゴミ箱") en_str = "trashbox_0";
-	else if (ja_str == "緑色もゴミ箱") en_str = "trashbox_0";
-	else if (ja_str == "緑のゴミ箱") en_str = "trashbox_0";
-	else if (ja_str == "緑もゴミ箱") en_str = "trashbox_0";
+	else if (pos != ja_str.find("テーブル")) en_str = storageSpaceName0;
 	//else if (ja_str == "これをとって") en_str = "take";
 
 	//捨てるor置く対象の指定
-	else if (ja_str == "赤色のゴミ箱") en_str = "trashbox_1";
-	else if (ja_str == "赤色もゴミ箱") en_str = "trashbox_1";
-	else if (ja_str == "赤のゴミ箱") en_str = "trashbox_1";
-	else if (ja_str == "赤もゴミ箱") en_str = "trashbox_1";
-	else if (ja_str == "赤いゴミ箱") en_str = "trashbox_1";
+	else if (pos != ja_str.find("キッチン")) en_str = storageSpaceName1;
 	//else if (ja_str == "これに捨てて") en_str = "put";
 	//else if (ja_str == "そこに捨てて") en_str = "put";
 	
-	else if (ja_str == "青色のゴミ箱") en_str = "trashbox_2";
-	else if (ja_str == "青色もゴミ箱") en_str = "trashbox_2";
-	else if (ja_str == "青のゴミ箱") en_str = "trashbox_2";
-	else if (ja_str == "青もゴミ箱") en_str = "trashbox_2";
-	else if (ja_str == "青いゴミ箱") en_str = "trashbox_2";
+	else if (pos != ja_str.find("ワゴン")) en_str = storageSpaceName2;
+
+	else if (pos != ja_str.find("棚") && pos != ja_str.find("本")) en_str = storageSpaceName3;
 	//else if (ja_str == "ここにおいて") en_str = "put";
 
-	else if (ja_str == "茶色のワゴン") en_str = "wagon_0";
-	else if (ja_str == "サイロのワゴン") en_str = "wagon_0";
-	else if (ja_str == "最後のワゴン") en_str = "wagon_0";
+	else if (pos != ja_str.find("棚") && pos != ja_str.find("食器")) en_str = storageSpaceName4;
+
+	else if (pos != ja_str.find("棚")) en_str = storageSpaceName5;
 
 	//捨てるor置く対象を間違った場合やり直す
 	else if (ja_str == "終わります") en_str = "finish";	
@@ -214,7 +213,7 @@ std::string VoiceRecognition::englishMessage2japaneseMessage(std::string english
 
 
 void VoiceRecognition::onInit(){
-	robotName = "robot_000";
+	robotName = "sobit";
 
 	ShellExecute(NULL, "open", "juliusbat\\julius-run.bat", NULL, NULL, SW_SHOW);
 
@@ -225,6 +224,13 @@ void VoiceRecognition::onInit(){
 	Enable = true;
 	preview_string = "";
 	
+	storageSpaceName0 = "Table";
+	storageSpaceName1 = "Kitchen";
+	storageSpaceName2 = "Wagon";
+	storageSpaceName3 = "BookShelf";
+	storageSpaceName4 = "CupBoard";
+	storageSpaceName5 = "Shelf";
+
 	ms.initialize();
 }
 
