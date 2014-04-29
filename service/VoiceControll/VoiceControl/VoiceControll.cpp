@@ -240,7 +240,7 @@ void VoiceRecognition::onInit(){
 	ofs.clear(); //‘O‰ñ•¶š—ñíœ
 	ofs.close();
 
-	Enable = true;
+	Enable = false;
 	preview_string = "";
 	
 	storageSpaceName0 = "Table";
