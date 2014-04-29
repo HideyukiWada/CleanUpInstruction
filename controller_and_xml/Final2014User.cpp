@@ -160,7 +160,7 @@ void UserController::onRecvMsg(RecvMsgEvent &evt)
 	
 
 	if (headss == "ORS_DATA") {
-		LOG_MSG(("%s",all_msg));
+		//LOG_MSG(("%s",all_msg));
 		//  }
 		//  if(headss == "HMD_DATA"){
 
@@ -222,7 +222,7 @@ void UserController::onRecvMsg(RecvMsgEvent &evt)
 		dQuaternion tmpQ3;
 		dQMultiply1(tmpQ3, bodyQ, tmpQ2);
 
-		my->setJointQuaternion("HEAD_JOINT0", tmpQ3[0], tmpQ3[1], tmpQ3[2], tmpQ3[3]);
+		my->setJointQuaternion("HEAD_JOINT0", tmpQ3[0], tmpQ3[1], -tmpQ3[2], tmpQ3[3]);
 	}
 	else if(headss == "KINECT_DATA"){
 	//KINECTデータによる頭部以外の体の動き反映
@@ -246,7 +246,7 @@ void UserController::onRecvMsg(RecvMsgEvent &evt)
 		this->throwTrash();
 		std::string msg = "release";
 		msg += " " + m_graspObjectName;
-		sendMsg("robot_000", msg);
+		sendMsg(robotName, msg);
 	}
 	
 

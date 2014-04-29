@@ -2,7 +2,7 @@
 SIG_SRC  = $(SIGVERSE_PATH)/include/sigverse
 
 #オブジェクトファイルの指定
-OBJS     = CleanUpDemo2014Robo.so cleanUpUser.so Final2014Robo.so Final2014User.so
+OBJS     = Final2014Robo.so Final2014User.so
 
 all: $(OBJS)
 
