@@ -115,7 +115,7 @@ std::string VoiceRecognition::japaneseMessage2englishMessage(std::string japanes
 	else if (ja_str == "始めます") en_str = "go";
 
 	//把持対象の指定
-	else if (std::string::npos != ja_str.find("テーブル")) en_str = storageSpaceName0;
+	else if (std::string::npos != ja_str.find("机") || std::string::npos != ja_str.find("黒")) en_str = storageSpaceName0;
 	//else if (ja_str == "これをとって") en_str = "take";
 
 	//捨てるor置く対象の指定
