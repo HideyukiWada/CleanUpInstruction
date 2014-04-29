@@ -508,7 +508,7 @@ void DemoRobotController::onRecvMsg(RecvMsgEvent &evt) {
 			sendMsg("VoiceReco_Service", str);
 			storageSpaceName = str;
 			frontStorageSpace = m_frontStorageSpace3;
-			throwPosition = m_throwPosition0;
+			throwPosition = m_throwPosition3;
 			sendMsg("SIGViewer", "Recognition Success!!");
 			error_count = 0;
 			m_state = 400;

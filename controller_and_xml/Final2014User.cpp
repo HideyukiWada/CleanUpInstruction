@@ -112,13 +112,15 @@ double UserController::onAction(ActionEvent &evt)
 
 	// サービスが使用可能か定期的にチェックする
 	bool av_kinect = checkService("SIGKINECT");
-	bool ch_kinect = checkService("SIGORS");
+	bool ch_ors = checkService("SIGORS");
 	
 
-	if (ch_kinect /*&& !chk_srv*/) {
+	if (ch_ors && m_ors == NULL) {
 		m_ors = connectToService("SIGORS");
 	}
-
+	else if (!ch_ors && m_ors != NULL){
+		m_ors = NULL;
+	}
 
 	// 使用可能
 	if(av_kinect && m_kinect == NULL){
