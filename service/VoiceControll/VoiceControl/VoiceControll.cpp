@@ -10,11 +10,13 @@
 #include <tchar.h>
 #include <stdio.h>
 #include <conio.h>
+#include <mmsystem.h>
 #include "MaltiSpeak.h"
 
 
 
 #pragma comment(lib, "user32.lib")
+#pragma comment(lib,"winmm.lib")
 
 bool Enable;
 
@@ -136,7 +138,10 @@ std::string VoiceRecognition::japaneseMessage2englishMessage(std::string japanes
 	else if (ja_str == "I‚í‚è‚Ü‚·") en_str = "finish";	
 
 	//“Á’è‚Ì–½—ßˆÈŠO‚Ìê‡
-	else en_str = "error";
+	else {
+		en_str = "error";
+		PlaySound("MySound.wav", NULL, SND_FILENAME | SND_ASYNC);
+	}
 	return en_str;
 }
 
