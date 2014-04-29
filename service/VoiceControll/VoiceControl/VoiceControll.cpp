@@ -111,7 +111,7 @@ std::string VoiceRecognition::japaneseMessage2englishMessage(std::string japanes
 	std::string en_str;
 
 	//クリーンナップ開始
-	if (std::string::npos != ja_str.find("片づけ")) en_str = "go";
+	if (std::string::npos != ja_str.find("かたづけ") || std::string::npos != ja_str.find("片づけ")) en_str = "go";
 	else if (ja_str == "始めます") en_str = "go";
 
 	//把持対象の指定
@@ -125,12 +125,12 @@ std::string VoiceRecognition::japaneseMessage2englishMessage(std::string japanes
 	
 	else if (std::string::npos != ja_str.find("ワゴン")) en_str = storageSpaceName2;
 
-	else if (std::string::npos != ja_str.find("棚") && std::string::npos != ja_str.find("本")) en_str = storageSpaceName3;
+	else if (std::string::npos != ja_str.find("白") || std::string::npos != ja_str.find("本")) en_str = storageSpaceName3;
 	//else if (ja_str == "ここにおいて") en_str = "put";
 
-	else if (std::string::npos != ja_str.find("棚") && std::string::npos != ja_str.find("食器")) en_str = storageSpaceName4;
+	else if (std::string::npos != ja_str.find("青") || std::string::npos != ja_str.find("食器")) en_str = storageSpaceName4;
 
-	else if (std::string::npos != ja_str.find("棚")) en_str = storageSpaceName5;
+	else if (std::string::npos != ja_str.find("茶") || std::string::npos != ja_str.find("棚")) en_str = storageSpaceName5;
 
 	//捨てるor置く対象を間違った場合やり直す
 	else if (ja_str == "終わります") en_str = "finish";	
