@@ -184,34 +184,38 @@ double DemoRobotController::onAction(ActionEvent &evt) {
 	}
 	case 100: {
 				this->neutralizeArms(evt.time());
+
 				m_state = 110;
 				LOG_MSG(("m_state:%d\n", m_state));
 				sendMsg("VoiceReco_Service", "start");
+				m_time = evt.time() + 4.0;
 				break;
 	}
 	case 110: {
 
 				//RobotObj *m_robotObject = getRobotObj(myname());
-				double angleJoint1 = m_robotObject->getJointAngle("RARM_JOINT0")*180.0 / (M_PI);
-				double angleJoint4 = m_robotObject->getJointAngle("RARM_JOINT3")*180.0 / (M_PI);
+				//double angleJoint1 = m_robotObject->getJointAngle("RARM_JOINT0")*180.0 / (M_PI);
+				//double angleJoint4 = m_robotObject->getJointAngle("RARM_JOINT3")*180.0 / (M_PI);
 
 				//LOG_MSG(("\nm_time1:%4f JOINT1 angle:%4f\nm_time4:%4f JOINT4 angle:%4f\n", m_time1, angleJoint1, m_time4, angleJoint4));
 				if (evt.time() >= m_time4) m_robotObject->setJointVelocity("RARM_JOINT3", 0.0, 0.0);
 				if (evt.time() >= m_time1) m_robotObject->setJointVelocity("RARM_JOINT0", 0.0, 0.0);
 				if (evt.time() >= m_time1 && evt.time() >= m_time4){
 					this->stopRobotMove();
-					sendMsg("VoiceReco_Service", "please pass my hand");
-					m_state = 200;
-					//m_state = 300;	//デバッグ用 手渡しをスキップ
-					//m_time = 6.0;
-
-					LOG_MSG(("m_state:%d\n", m_state));
+					if (evt.time() >= m_time){
+						sendMsg("VoiceReco_Service", "please pass my hand");
+						m_state = 200;
+						//m_state = 300;	//デバッグ用 手渡しをスキップ
+						//m_time = 6.0;
+						m_time = evt.time() + 4.0;
+						LOG_MSG(("m_state:%d\n", m_state));
+					}
 				}
 				break;
 	}
 		//手渡し対機
 	case 200: {
-				if (m_grasp == false && m_release == false){
+				if (m_grasp == false && m_release == false && evt.time() >= m_time){
 					//自分を取得
 					RobotObj *m_robotObject = getRobotObj(myname());
 					//自分の手のパーツを得ます
@@ -223,20 +227,25 @@ double DemoRobotController::onAction(ActionEvent &evt) {
 						m_state = 300;
 						LOG_MSG(("m_state:%d\n", m_state));
 
+						m_time = evt.time() + 3.0;
+
 						//運ぶ物体を対応表に記録
 						std::string msg = "object";
 						msg += " " + m_graspObjectName;
 						sendMsg("Memorize_Service", msg);
 					}
+					else m_time = evt.time();
 				}
 				break;
 	}
 	case 300: {
-				double l_moveTime = rotateTowardObj(Vector3d(10.0, 0.0, -90));
+				if (evt.time() >= m_time){
+					double l_moveTime = rotateTowardObj(Vector3d(10.0, 0.0, -90));
 
-				m_time = l_moveTime + evt.time();
-				m_state = 310;
-				LOG_MSG(("m_state:%d\n", m_state));
+					m_time = l_moveTime + evt.time();
+					m_state = 310;
+					LOG_MSG(("m_state:%d\n", m_state));
+				}
 				break;
 	}
 	case 310: {
@@ -247,6 +256,8 @@ double DemoRobotController::onAction(ActionEvent &evt) {
 					m_state = 320;
 					//m_state = 400;	//デバッグ用 発話対機をスキップ
 
+					m_time = evt.time() + 4.0;
+
 					LOG_MSG(("m_state:%d\n", m_state));
 				}
 				break;
@@ -256,11 +267,13 @@ double DemoRobotController::onAction(ActionEvent &evt) {
 			  break;
 	}
 	case 400: {
-				double l_moveTime = rotateTowardObj(frontStorageSpace);
+				if (evt.time() >= m_time){
+					double l_moveTime = rotateTowardObj(frontStorageSpace);
 
-				m_time = l_moveTime + evt.time();
-				m_state = 410;
-				LOG_MSG(("m_state:%d\n", m_state));
+					m_time = l_moveTime + evt.time();
+					m_state = 410;
+					LOG_MSG(("m_state:%d\n", m_state));
+				}
 				break;
 	}
 	case 410: {
