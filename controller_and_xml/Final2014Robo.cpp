@@ -112,8 +112,8 @@ void DemoRobotController::onInit(InitEvent &evt) {
 	m_time1 = 0.0;
 	m_time4 = 0.0;
 
-	//m_state = 0;
-	m_state = 100;  // switch of initial behavior
+	m_state = 0;
+	//m_state = 100;  // switch of initial behavior
 	//m_state = 9140;
 
 
@@ -180,9 +180,11 @@ void DemoRobotController::onInit(InitEvent &evt) {
 double DemoRobotController::onAction(ActionEvent &evt) {
 	switch (m_state){
 	case 0: {
+				sendMsg("VoiceReco_Service", "Start_Reco");
 				break;
 	}
 	case 100: {
+				sendMsg("VoiceReco_Service", "Stop_Reco");
 				this->neutralizeArms(evt.time());
 
 				m_state = 110;
@@ -264,9 +266,11 @@ double DemoRobotController::onAction(ActionEvent &evt) {
 	}
 		//発話対機状態
 	case 320: {
-			  break;
+				sendMsg("VoiceReco_Service", "Start_Reco");
+				break;
 	}
 	case 400: {
+				sendMsg("VoiceReco_Service", "Stop_Reco");
 				if (evt.time() >= m_time){
 					double l_moveTime = rotateTowardObj(frontStorageSpace);
 
@@ -429,9 +433,17 @@ double DemoRobotController::onAction(ActionEvent &evt) {
 					  storageSpaceName = storageSpaceName2;
 					  throwPosition = m_throwPosition2;
 
-					  m_state = 100;
+					  m_state = 520;
 					  LOG_MSG(("m_state:%d\n", m_state));
 				  }
+				  break;
+	}
+	case 520: {
+				  this->neutralizeArms(evt.time());
+
+				  m_state = 110;
+				  LOG_MSG(("m_state:%d\n", m_state));
+				  m_time = evt.time();
 				  break;
 	}
 
