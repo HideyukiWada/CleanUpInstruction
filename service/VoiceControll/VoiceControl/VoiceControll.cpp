@@ -113,7 +113,7 @@ std::string VoiceRecognition::japaneseMessage2englishMessage(std::string japanes
 	std::string en_str;
 
 	//クリーンナップ開始
-	if (std::string::npos != ja_str.find("かたづけ") || std::string::npos != ja_str.find("片づけ")) en_str = "go";
+	if (std::string::npos != ja_str.find("かたづけ") || std::string::npos != ja_str.find("片づけ") || std::string::npos != ja_str.find("片付け")) en_str = "go";
 	else if (ja_str == "始めます") en_str = "go";
 
 	//把持対象の指定
@@ -298,7 +298,9 @@ void VoiceRecognition::onRecvMsg(sigverse::RecvMsgEvent &evt)
 	{
 		Enable = true;
 	}
-	ms.noWaitSpeak(englishMessage2japaneseMessage(s));//発話
+	else{
+		ms.noWaitSpeak(englishMessage2japaneseMessage(s));//発話
+	}
 }
 
 int main(int argc, char** argv)
