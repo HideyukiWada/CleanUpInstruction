@@ -62,6 +62,10 @@ public:
 	int objectIndex;
 	//運び先が何個目に記述されているか
 	int storageSpaceIndex;
+	//物体の最大文字数
+	int maxObjectNameLength;
+	//片付け先の最大文字数
+	int maxStorageSpaceNameLength;
 
 	//物体名を受信したか
 	bool receiveObject;
@@ -81,11 +85,14 @@ MemorizeStorageSpace::~MemorizeStorageSpace()
 
 
 void MemorizeStorageSpace::onInit(){
-	robotName = "robot_000";
+	robotName = "sobit";
 	listName = "StorageSpaceList.txt";
 
 	receiveObject = false;
 	receiveStorageSpace = false;
+
+	maxObjectNameLength = 0;
+	maxStorageSpaceNameLength = 0;
 
 	readList();
 	
@@ -186,25 +193,51 @@ void MemorizeStorageSpace::readList()
 */
 void MemorizeStorageSpace::writeList()
 {
+
+	for (int i = 0; i < cul.size(); i++){
+		if (cul[i].objectName.length() > maxObjectNameLength){
+			maxObjectNameLength = cul[i].objectName.length();
+		}
+		for (int j = 0; j < cul[i].storageSpaceCount; j++){
+			cul[i].storageSpaceName[j];
+			if (cul[i].storageSpaceName[j].length() > maxStorageSpaceNameLength){
+				maxStorageSpaceNameLength = cul[i].storageSpaceName[j].length();
+			}
+		}
+	}
+
 	//対応表を一度空にする
 	std::ofstream clear(listName.c_str(), std::ios::trunc);
 	
 	std::ofstream ofs(listName.c_str(), std::ios::app);
 	for (int i = 0; i < cul.size(); i++){
-		ofs << cul[i].objectName << " ";
-		ofs << cul[i].storageSpaceCount << " ";
+		ofs << cul[i].objectName;
+		//成型用
+		for (int num = 0; num < ( maxObjectNameLength - cul[i].objectName.length() ); num++){
+			ofs << " ";
+		}
+		ofs << "\t";
+
+		ofs << cul[i].storageSpaceCount << "\t";
 
 		for (int j = 0; j < cul[i].storageSpaceCount; j++){
-			ofs << cul[i].storageSpaceName[j] << " ";
+			ofs << cul[i].storageSpaceName[j];
+			//成型用
+			for (int num = 0; num < (maxStorageSpaceNameLength - cul[i].storageSpaceName[j].length()); num++){
+				ofs << " ";
+			}
+			ofs << " ";
 			ofs << cul[i].cleanUpCount[j];
 			if (j < cul[i].storageSpaceCount - 1){
-				ofs << " ";
+				ofs << "\t";
 			}
 		}
 		if (i < cul.size() - 1){
 			ofs << std::endl;
 		}
 	}
+	maxObjectNameLength = 0;
+	maxStorageSpaceNameLength = 0;
 }
 
 /*findObject

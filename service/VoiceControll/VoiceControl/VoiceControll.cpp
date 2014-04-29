@@ -195,32 +195,32 @@ std::string VoiceRecognition::englishMessage2japaneseMessage(std::string english
 	else if (en_str == storageSpaceName0)
 	{
 		m_pointedtrash = storageSpaceName0;
-		ja_str = "分かりました、" + m_pointedObject + "を、" + m_pointedtrash + "、に置きに行きます";
+		ja_str = "分かりました、" + m_pointedObject + "を、" + "テーブル" + "、に置きに行きます";
 	}
 	else if (en_str == storageSpaceName1)
 	{
 		m_pointedtrash = storageSpaceName1;
-		ja_str = "分かりました、" + m_pointedObject + "を、" + m_pointedtrash + "、に置きに行きます";
+		ja_str = "分かりました、" + m_pointedObject + "を、" + "キッチン" + "、に置きに行きます";
 	}
 	else if (en_str == storageSpaceName2)
 	{
 		m_pointedtrash = storageSpaceName2;
-		ja_str = "分かりました、" + m_pointedObject + "を、" + m_pointedtrash + "、に置きに行きます";
+		ja_str = "分かりました、" + m_pointedObject + "を、" + "ワゴン" + "、に置きに行きます";
 	}
 	else if (en_str == storageSpaceName3)
 	{
 		m_pointedtrash = storageSpaceName3;
-		ja_str = "分かりました、" + m_pointedObject + "を、" + m_pointedtrash + "、に置きに行きます";
+		ja_str = "分かりました、" + m_pointedObject + "を、" + "本棚" + "、に置きに行きます";
 	}
 	else if (en_str == storageSpaceName4)
 	{
 		m_pointedtrash = storageSpaceName4;
-		ja_str = "分かりました、" + m_pointedObject + "を、" + m_pointedtrash + "、に置きに行きます";
+		ja_str = "分かりました、" + m_pointedObject + "を、" + "食器棚" + "、に置きに行きます";
 	}
 	else if (en_str == storageSpaceName5)
 	{
 		m_pointedtrash = storageSpaceName5;
-		ja_str = "分かりました、" + m_pointedObject + "を、" + m_pointedtrash + "、に置きに行きます";
+		ja_str = "分かりました、" + m_pointedObject + "を、" + "棚" + "、に置きに行きます";
 	}
 	return ja_str;
 }
