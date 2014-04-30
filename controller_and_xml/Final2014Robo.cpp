@@ -49,6 +49,7 @@ private:
 	double m_time1;
 	double m_time4;
 
+	//片付け先の名前
 	std::string storageSpaceName0;
 	std::string storageSpaceName1;
 	std::string storageSpaceName2;
@@ -56,6 +57,10 @@ private:
 	std::string storageSpaceName4;
 	std::string storageSpaceName5;
 	std::string storageSpaceName;
+
+	//自動で片付けるかどうか
+	std::string autoMode;	//自動で片付ける
+	std::string selectMode;	//片付け先を指定
 
 	//収納場所からこの距離だけ離れて止まる
 	double stopMargin;
@@ -112,8 +117,8 @@ void DemoRobotController::onInit(InitEvent &evt) {
 	m_time1 = 0.0;
 	m_time4 = 0.0;
 
-	m_state = 0;
-	//m_state = 100;  // switch of initial behavior
+	//m_state = 0;
+	m_state = 100;  // switch of initial behavior
 	//m_state = 9140;
 
 
@@ -138,6 +143,8 @@ void DemoRobotController::onInit(InitEvent &evt) {
 	objectList.push_back("Penguin");
 	objectList.push_back("Cup");
 
+	autoMode = "auto_mode";
+	selectMode = "select_mode";
 
 	//m_graspObjectName = m_trashName2;
 
@@ -492,75 +499,84 @@ void DemoRobotController::onRecvMsg(RecvMsgEvent &evt) {
 		//else sendMsg("VoiceReco_Service", "Message is not accepted");
 	}
 	else if (m_state == 320){
-		if (str == "error"){
-			error_count++;
-			ss << error_count << ":Recognition Failure!!";
-			sendMsg("SIGViewer", ss.str());
-			ss.str("");
-			ss.clear();
-		}
-		else if (str == storageSpaceName0){
-			sendMsg("VoiceReco_Service", str);
-			storageSpaceName = str;
-			frontStorageSpace = m_frontStorageSpace0;
-			throwPosition = m_throwPosition0;
-			sendMsg("SIGViewer", "Recognition Success!!");
-			error_count = 0;
-			m_state = 400;
-			LOG_MSG(("m_state:%d\n", m_state));
-		}
-		else if (str == storageSpaceName1){
-			sendMsg("VoiceReco_Service", str);
-			storageSpaceName = str;
-			frontStorageSpace = m_frontStorageSpace1;
-			throwPosition = m_throwPosition1;
-			sendMsg("SIGViewer", "Recognition Success!!");
-			error_count = 0;
-			m_state = 400;
-			LOG_MSG(("m_state:%d\n", m_state));
-		}
-		else if (str == storageSpaceName2){
-			sendMsg("VoiceReco_Service", str);
-			storageSpaceName = str;
-			frontStorageSpace = m_frontStorageSpace2;
-			throwPosition = m_throwPosition2;
-			sendMsg("SIGViewer", "Recognition Success!!");
-			error_count = 0;
-			m_state = 400;
-			LOG_MSG(("m_state:%d\n", m_state));
-		}
-		else if (str == storageSpaceName3){
-			sendMsg("VoiceReco_Service", str);
-			storageSpaceName = str;
-			frontStorageSpace = m_frontStorageSpace3;
-			throwPosition = m_throwPosition3;
-			sendMsg("SIGViewer", "Recognition Success!!");
-			error_count = 0;
-			m_state = 400;
-			LOG_MSG(("m_state:%d\n", m_state));
-		}
-		else if (str == storageSpaceName4){
-			sendMsg("VoiceReco_Service", str);
-			storageSpaceName = str;
-			frontStorageSpace = m_frontStorageSpace4;
-			throwPosition = m_throwPosition4;
-			sendMsg("SIGViewer", "Recognition Success!!");
-			error_count = 0;
-			m_state = 400;
-			LOG_MSG(("m_state:%d\n", m_state));
-		}
-		else if (str == storageSpaceName5){
-			sendMsg("VoiceReco_Service", str);
-			storageSpaceName = str;
-			frontStorageSpace = m_frontStorageSpace5;
-			throwPosition = m_throwPosition5;
-			sendMsg("SIGViewer", "Recognition Success!!");
-			error_count = 0;
-			m_state = 400;
-			LOG_MSG(("m_state:%d\n", m_state));
-		}
-		//else sendMsg("VoiceReco_Service", "Message is not accepted");
+		//if (headss == selectMode){
+			if (str == "error"){
+				error_count++;
+				ss << error_count << ":Recognition Failure!!";
+				sendMsg("SIGViewer", ss.str());
+				ss.str("");
+				ss.clear();
+			}
+			//else(headss == autoMode){
+			//	sendMsg("VoiceReco_Service", autoMode);
+			//}
+			else if(str == autoMode){
+				sendMsg("Memorize_Service", autoMode);
+			}
+			else if (str == storageSpaceName0){
+				sendMsg("VoiceReco_Service", str);
+				storageSpaceName = str;
+				frontStorageSpace = m_frontStorageSpace0;
+				throwPosition = m_throwPosition0;
+				sendMsg("SIGViewer", "Recognition Success!!");
+				error_count = 0;
+				m_state = 400;
+				LOG_MSG(("m_state:%d\n", m_state));
+			}
+			else if (str == storageSpaceName1){
+				sendMsg("VoiceReco_Service", str);
+				storageSpaceName = str;
+				frontStorageSpace = m_frontStorageSpace1;
+				throwPosition = m_throwPosition1;
+				sendMsg("SIGViewer", "Recognition Success!!");
+				error_count = 0;
+				m_state = 400;
+				LOG_MSG(("m_state:%d\n", m_state));
+			}
+			else if (str == storageSpaceName2){
+				sendMsg("VoiceReco_Service", str);
+				storageSpaceName = str;
+				frontStorageSpace = m_frontStorageSpace2;
+				throwPosition = m_throwPosition2;
+				sendMsg("SIGViewer", "Recognition Success!!");
+				error_count = 0;
+				m_state = 400;
+				LOG_MSG(("m_state:%d\n", m_state));
+			}
+			else if (str == storageSpaceName3){
+				sendMsg("VoiceReco_Service", str);
+				storageSpaceName = str;
+				frontStorageSpace = m_frontStorageSpace3;
+				throwPosition = m_throwPosition3;
+				sendMsg("SIGViewer", "Recognition Success!!");
+				error_count = 0;
+				m_state = 400;
+				LOG_MSG(("m_state:%d\n", m_state));
+			}
+			else if (str == storageSpaceName4){
+				sendMsg("VoiceReco_Service", str);
+				storageSpaceName = str;
+				frontStorageSpace = m_frontStorageSpace4;
+				throwPosition = m_throwPosition4;
+				sendMsg("SIGViewer", "Recognition Success!!");
+				error_count = 0;
+				m_state = 400;
+				LOG_MSG(("m_state:%d\n", m_state));
+			}
+			else if (str == storageSpaceName5){
+				sendMsg("VoiceReco_Service", str);
+				storageSpaceName = str;
+				frontStorageSpace = m_frontStorageSpace5;
+				throwPosition = m_throwPosition5;
+				sendMsg("SIGViewer", "Recognition Success!!");
+				error_count = 0;
+				m_state = 400;
+				LOG_MSG(("m_state:%d\n", m_state));
+			}
+		//}
+
 	}
+		//else sendMsg("VoiceReco_Service", "Message is not accepted");
 	else if (str == "finish"){
 		sendMsg("VoiceReco_Service", str);
 		disconnectToService("VoiceReco_Service");
