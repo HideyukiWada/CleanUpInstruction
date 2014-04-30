@@ -10,6 +10,9 @@
 //convert angle unit from degree to radian
 #define DEG2RAD(DEG) ( (M_PI) * (DEG) / 180.0 )
 
+#define H_SPEED 4.0
+#define L_SPEED 1.5
+
 class DemoRobotController : public Controller {
 public:  
 	void onInit(InitEvent &evt);  
@@ -25,6 +28,8 @@ public:
 	double goGraspingObject(Vector3d &pos);
 	void neutralizeArms(double evt_time);
 	void prepareThrowing(double evt_time);
+	void changeSpeedLow2High();
+	void changeSpeedHigh2Low();
 
 private:
 	RobotObj *m_robotObject;
@@ -125,7 +130,7 @@ void DemoRobotController::onInit(InitEvent &evt) {
 	refreshRateOnAction = 0.1;     // refresh-rate for onAction proc.
 
 	// angular velocity of wheel and moving speed of robot
-	m_angularVelocity = 1.5;
+	m_angularVelocity = L_SPEED;
 	m_movingSpeed = m_angularVelocity*m_radius;  // conversion: rad/ms -> m/ms)
 
 	// rotation speed of joint
@@ -211,6 +216,8 @@ double DemoRobotController::onAction(ActionEvent &evt) {
 				if (evt.time() >= m_time1) m_robotObject->setJointVelocity("RARM_JOINT0", 0.0, 0.0);
 				if (evt.time() >= m_time1 && evt.time() >= m_time4){
 					this->stopRobotMove();
+					m_robotObject->setJointAngle("RARM_JOINT0", DEG2RAD(-50));
+					m_robotObject->setJointAngle("RARM_JOINT3", DEG2RAD(-70));
 					if (evt.time() >= m_time){
 						sendMsg("VoiceReco_Service", "please pass my hand");
 						m_state = 200;
@@ -290,12 +297,22 @@ double DemoRobotController::onAction(ActionEvent &evt) {
 	case 410: {
 				if (evt.time() >= m_time){
 					this->stopRobotMove();
+					changeSpeedLow2High();
 					double l_moveTime = goToObj(frontStorageSpace, 0.0);
-					m_time = l_moveTime + evt.time();
-					m_state = 420;
+					m_time = l_moveTime + evt.time() -1.0;
+					m_state = 415;
 					LOG_MSG(("m_state:%d\n", m_state));
 				}
 				break;
+	}
+	case 415: {
+				  if (evt.time() >= m_time){
+					  changeSpeedHigh2Low();
+					  double l_moveTime = goToObj(frontStorageSpace, 0.0);
+					  m_time = l_moveTime + evt.time();
+					  m_state = 420;
+					  LOG_MSG(("m_state:%d\n", m_state));
+				  }
 	}
 	case 420: {
 				if (evt.time() >= m_time){
@@ -309,14 +326,16 @@ double DemoRobotController::onAction(ActionEvent &evt) {
 	}
 	case 430: {
 				//RobotObj *m_robotObject = getRobotObj(myname());
-				double angleJoint1 = m_robotObject->getJointAngle("RARM_JOINT0")*180.0 / (M_PI);
-				double angleJoint4 = m_robotObject->getJointAngle("RARM_JOINT3")*180.0 / (M_PI);
+				//double angleJoint1 = m_robotObject->getJointAngle("RARM_JOINT0")*180.0 / (M_PI);
+				//double angleJoint4 = m_robotObject->getJointAngle("RARM_JOINT3")*180.0 / (M_PI);
 
 				//LOG_MSG(("\nm_time1:%4f JOINT1 angle:%4f\nm_time4:%4f JOINT4 angle:%4f\n", m_time1, angleJoint1, m_time4, angleJoint4));
 				if (evt.time() >= m_time4) m_robotObject->setJointVelocity("RARM_JOINT3", 0.0, 0.0);
 				if (evt.time() >= m_time1) m_robotObject->setJointVelocity("RARM_JOINT0", 0.0, 0.0);
 				if (evt.time() >= m_time1 && evt.time() >= m_time4){
 					this->stopRobotMove();
+					m_robotObject->setJointAngle("RARM_JOINT0", DEG2RAD(-50));
+					m_robotObject->setJointAngle("RARM_JOINT3", DEG2RAD(-60));
 					//Vector3d l_tpos;
 					//this->recognizeObjectPosition(l_tpos, storageSpaceName);
 					//double l_moveTime = rotateTowardObj(l_tpos);
@@ -336,13 +355,31 @@ double DemoRobotController::onAction(ActionEvent &evt) {
 					//this->recognizeObjectPosition(l_tpos, storageSpaceName);
 					//double l_moveTime = goToObj(l_tpos, stopMargin);
 
+					changeSpeedLow2High();
 					double l_moveTime = goToObj(throwPosition, stopMargin);
-					m_time = l_moveTime + evt.time();
+					m_time = l_moveTime + evt.time() - 1.0;
 
-					m_state = 450;
+					m_state = 445;
 					LOG_MSG(("m_state:%d\n", m_state));
 				}
 				break;
+	}
+	case 445: {
+				  if (evt.time() >= m_time){
+
+					  this->stopRobotMove();
+					  Vector3d l_tpos;
+					  //this->recognizeObjectPosition(l_tpos, storageSpaceName);
+					  //double l_moveTime = goToObj(l_tpos, stopMargin);
+
+					  changeSpeedHigh2Low();
+					  double l_moveTime = goToObj(throwPosition, stopMargin);
+					  m_time = l_moveTime + evt.time();
+
+					  m_state = 450;
+					  LOG_MSG(("m_state:%d\n", m_state));
+				  }
+				  break;
 	}
 	case 450: {  // throw trash and get back a bit
 				if (evt.time() >= m_time){
@@ -383,7 +420,23 @@ double DemoRobotController::onAction(ActionEvent &evt) {
 					  //Vector3d l_tpos;
 					  //this->recognizeObjectPosition(l_tpos, storageSpaceName);
 					  //double l_moveTime = goToObj(l_tpos, stopMargin);
+					  changeSpeedLow2High();
+					  double l_moveTime = goToObj(frontStorageSpace, stopMargin);
+					  m_time = l_moveTime + evt.time() - 1.0;
 
+					  m_state = 475;
+					  LOG_MSG(("m_state:%d\n", m_state));
+				  }
+				  break;
+	}
+	case 475: {
+				  if (evt.time() >= m_time){
+
+					  this->stopRobotMove();
+					  //Vector3d l_tpos;
+					  //this->recognizeObjectPosition(l_tpos, storageSpaceName);
+					  //double l_moveTime = goToObj(l_tpos, stopMargin);
+					  changeSpeedHigh2Low();
 					  double l_moveTime = goToObj(frontStorageSpace, stopMargin);
 					  m_time = l_moveTime + evt.time();
 
@@ -410,7 +463,23 @@ double DemoRobotController::onAction(ActionEvent &evt) {
 					  //Vector3d l_tpos;
 					  //this->recognizeObjectPosition(l_tpos, storageSpaceName);
 					  //double l_moveTime = goToObj(l_tpos, stopMargin);
+					  changeSpeedLow2High();
+					  double l_moveTime = goToObj(m_waitPosition, stopMargin);
+					  m_time = l_moveTime + evt.time() - 1.0;
 
+					  m_state = 495;
+					  LOG_MSG(("m_state:%d\n", m_state));
+				  }
+				  break;
+	}
+	case 495: {
+				  if (evt.time() >= m_time){
+
+					  this->stopRobotMove();
+					  //Vector3d l_tpos;
+					  //this->recognizeObjectPosition(l_tpos, storageSpaceName);
+					  //double l_moveTime = goToObj(l_tpos, stopMargin);
+					  changeSpeedHigh2Low();
 					  double l_moveTime = goToObj(m_waitPosition, stopMargin);
 					  m_time = l_moveTime + evt.time();
 
@@ -721,6 +790,18 @@ double DemoRobotController::rotateTowardObj(Vector3d pos) {  // "pos" means targ
 
 		return l_time;
 	}
+}
+
+void DemoRobotController::changeSpeedLow2High(){
+
+	m_angularVelocity = H_SPEED;
+	m_movingSpeed = m_angularVelocity*m_radius;
+}
+
+void DemoRobotController::changeSpeedHigh2Low(){
+
+	m_angularVelocity = L_SPEED;
+	m_movingSpeed = m_angularVelocity*m_radius;
 }
 
 void DemoRobotController::recognizeObjectPosition(Vector3d &pos, std::string &name){
