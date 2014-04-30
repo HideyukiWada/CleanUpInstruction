@@ -191,7 +191,7 @@ std::string VoiceRecognition::englishMessage2japaneseMessage(std::string english
 	}*/
 	else if (en_str == "please choose the trashbox")
 	{
-		ja_str = "指示を下サイ＾";
+		ja_str = "指示してください";
 	}
 	else if (en_str == "Clock") 
 	{
@@ -228,7 +228,7 @@ std::string VoiceRecognition::englishMessage2japaneseMessage(std::string english
 			ja_str = "分かりました、" + m_pointedObject + "を、" + "テーブル" + "、に置きに行きます";
 		}
 		else{
-			ja_str = m_pointedObject + "、が、一番運ばれた場所は、テーブルです。テーブルに持っていきます";
+			ja_str = m_pointedObject + "は、テーブルに一番運ばれています。テーブルに持っていきます";
 		}
 	}
 	else if (en_str == storageSpaceName1)
@@ -238,7 +238,7 @@ std::string VoiceRecognition::englishMessage2japaneseMessage(std::string english
 			ja_str = "分かりました、" + m_pointedObject + "を、" + "キッチン" + "、に置きに行きます";
 		}
 		else{
-			ja_str = m_pointedObject + "、が、一番運ばれた場所は、キッチンです。キッチンに持っていきます";
+			ja_str = m_pointedObject + "は、キッチンに一番運ばれています。キッチンに持っていきます";
 		}
 	}
 	else if (en_str == storageSpaceName2)
@@ -248,7 +248,7 @@ std::string VoiceRecognition::englishMessage2japaneseMessage(std::string english
 			ja_str = "分かりました、" + m_pointedObject + "を、" + "ワゴン" + "、に置きに行きます";
 		}
 		else{
-			ja_str = m_pointedObject + "、が、一番運ばれた場所は、ワゴンです。ワゴンに持っていきます";
+			ja_str = m_pointedObject + "は、ワゴンに一番運ばれています。ワゴンに持っていきます";
 		}
 	}
 	else if (en_str == storageSpaceName3)
@@ -258,7 +258,7 @@ std::string VoiceRecognition::englishMessage2japaneseMessage(std::string english
 			ja_str = "分かりました、" + m_pointedObject + "を、" + "本棚" + "、に置きに行きます";
 		}
 		else{
-			ja_str = m_pointedObject + "、が、一番運ばれた場所は、本棚です。本棚に持っていきます";
+			ja_str = m_pointedObject + "は、本棚に一番運ばれています。本棚に持っていきます";
 		}
 	}
 	else if (en_str == storageSpaceName4)
@@ -268,7 +268,7 @@ std::string VoiceRecognition::englishMessage2japaneseMessage(std::string english
 			ja_str = "分かりました、" + m_pointedObject + "を、" + "食器棚" + "、に置きに行きます";
 		}
 		else{
-			ja_str = m_pointedObject + "、が、一番運ばれた場所は、食器棚です。食器棚に持っていきます";
+			ja_str = m_pointedObject + "は、食器棚に一番運ばれています。食器棚に持っていきます";
 		}
 	}
 	else if (en_str == storageSpaceName5)
@@ -278,7 +278,7 @@ std::string VoiceRecognition::englishMessage2japaneseMessage(std::string english
 			ja_str = "分かりました、" + m_pointedObject + "を、" + "棚" + "、に置きに行きます";
 		}
 		else{
-			ja_str = m_pointedObject + "、が、一番運ばれた場所は、棚です。棚に持っていきます";
+			ja_str = m_pointedObject + "は、棚に一番運ばれています。棚に持っていきます";
 		}
 	}
 	return ja_str;

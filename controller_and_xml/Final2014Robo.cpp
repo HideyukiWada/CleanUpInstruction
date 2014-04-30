@@ -53,6 +53,7 @@ private:
 	double m_time;
 	double m_time1;
 	double m_time4;
+	double talk_time;
 
 	//片付け先の名前
 	std::string storageSpaceName0;
@@ -121,6 +122,7 @@ void DemoRobotController::onInit(InitEvent &evt) {
 	m_time = 0.0;
 	m_time1 = 0.0;
 	m_time4 = 0.0;
+	talk_time = 0.0;
 
 	//m_state = 0;
 	m_state = 100;  // switch of initial behavior
@@ -173,7 +175,7 @@ void DemoRobotController::onInit(InitEvent &evt) {
 	m_relayPoint1    = Vector3d(90.0, 0.0, -100.0);
 	m_frontTrash1    = Vector3d(273.0, 0.0, -65.0);
 	m_frontTrash2    = Vector3d(305.0, 0.0, -80.0);
-	m_waitPosition   = Vector3d(70.0, 0.0, 50.0);
+	m_waitPosition   = Vector3d(90.0, 0.0, 50.0);
 	m_userPosition   = Vector3d(180.0, 0.0, 50.0);
 
 	m_grasp = false;
@@ -223,7 +225,7 @@ double DemoRobotController::onAction(ActionEvent &evt) {
 						m_state = 200;
 						//m_state = 300;	//デバッグ用 手渡しをスキップ
 						//m_time = 6.0;
-						m_time = evt.time() + 4.0;
+						talk_time = evt.time() + 4.0;
 						LOG_MSG(("m_state:%d\n", m_state));
 					}
 				}
@@ -231,7 +233,7 @@ double DemoRobotController::onAction(ActionEvent &evt) {
 	}
 		//手渡し対機
 	case 200: {
-				if (m_grasp == false && m_release == false && evt.time() >= m_time){
+				if (m_grasp == false && m_release == false){
 					//自分を取得
 					RobotObj *m_robotObject = getRobotObj(myname());
 					//自分の手のパーツを得ます
@@ -239,7 +241,6 @@ double DemoRobotController::onAction(ActionEvent &evt) {
 					sendMsg("SIGViewer", m_graspObjectName);
 					if (parts->graspObj(m_graspObjectName)){
 						m_grasp = true;
-						sendMsg("VoiceReco_Service", m_graspObjectName);
 						m_state = 300;
 						LOG_MSG(("m_state:%d\n", m_state));
 
@@ -249,6 +250,10 @@ double DemoRobotController::onAction(ActionEvent &evt) {
 						std::string msg = "object";
 						msg += " " + m_graspObjectName;
 						sendMsg("Memorize_Service", msg);
+						if (evt.time() >= talk_time){
+							sendMsg("VoiceReco_Service", m_graspObjectName);
+							talk_time = 100000.0;
+						}
 					}
 					else m_time = evt.time();
 				}
@@ -262,6 +267,10 @@ double DemoRobotController::onAction(ActionEvent &evt) {
 					m_state = 310;
 					LOG_MSG(("m_state:%d\n", m_state));
 				}
+				if (evt.time() >= talk_time){
+					sendMsg("VoiceReco_Service", m_graspObjectName);
+					talk_time = 100000.0;
+				}
 				break;
 	}
 	case 310: {
@@ -272,7 +281,7 @@ double DemoRobotController::onAction(ActionEvent &evt) {
 					m_state = 320;
 					//m_state = 400;	//デバッグ用 発話対機をスキップ
 
-					m_time = evt.time() + 4.0;
+					talk_time = evt.time() + 4.0;
 
 					LOG_MSG(("m_state:%d\n", m_state));
 				}
@@ -285,13 +294,11 @@ double DemoRobotController::onAction(ActionEvent &evt) {
 	}
 	case 400: {
 				sendMsg("VoiceReco_Service", "Stop_Reco");
-				if (evt.time() >= m_time){
-					double l_moveTime = rotateTowardObj(frontStorageSpace);
+				double l_moveTime = rotateTowardObj(frontStorageSpace);
 
-					m_time = l_moveTime + evt.time();
-					m_state = 410;
-					LOG_MSG(("m_state:%d\n", m_state));
-				}
+				m_time = l_moveTime + evt.time();
+				m_state = 410;
+				LOG_MSG(("m_state:%d\n", m_state));
 				break;
 	}
 	case 410: {
