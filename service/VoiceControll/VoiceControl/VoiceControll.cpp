@@ -96,6 +96,11 @@ public:
 	std::string storageSpaceName3;	//本棚
 	std::string storageSpaceName4;	//食器棚
 	std::string storageSpaceName5;	//棚
+
+	//自動で片付けるかどうか
+	std::string autoMode;	//自動で片付ける
+	std::string selectMode;	//片付け先を指定
+	bool autoflag; //自動で片付けるならtrue
 };
 
 VoiceRecognition::~VoiceRecognition()
@@ -113,27 +118,46 @@ std::string VoiceRecognition::japaneseMessage2englishMessage(std::string japanes
 	std::string en_str;
 
 	//クリーンナップ開始
-	if (std::string::npos != ja_str.find("かたづけ") || std::string::npos != ja_str.find("片づけ") || std::string::npos != ja_str.find("片付け")) en_str = "go";
-	else if (ja_str == "始めます") en_str = "go";
+	
+	if (ja_str == "始めます") en_str = "go";
 
 	//把持対象の指定
-	else if (std::string::npos != ja_str.find("机") || std::string::npos != ja_str.find("黒")) en_str = storageSpaceName0;
+	else if (std::string::npos != ja_str.find("机") || std::string::npos != ja_str.find("黒")){
+		en_str = storageSpaceName0;
+		autoflag = false;
+	}
 	//else if (ja_str == "これをとって") en_str = "take";
 
 	//捨てるor置く対象の指定
-	else if (std::string::npos != ja_str.find("キッチン")) en_str = storageSpaceName1;
+	else if (std::string::npos != ja_str.find("キッチン")){
+		en_str = storageSpaceName1;
+		autoflag = false;
+	}
 	//else if (ja_str == "これに捨てて") en_str = "put";
 	//else if (ja_str == "そこに捨てて") en_str = "put";
 	
-	else if (std::string::npos != ja_str.find("ワゴン")) en_str = storageSpaceName2;
-
-	else if (std::string::npos != ja_str.find("白") || std::string::npos != ja_str.find("本")) en_str = storageSpaceName3;
+	else if (std::string::npos != ja_str.find("ワゴン")){
+		en_str = storageSpaceName2;
+		autoflag = false;
+	}
+	else if (std::string::npos != ja_str.find("白") || std::string::npos != ja_str.find("本")){
+		en_str = storageSpaceName3;
+		autoflag = false;
+	}
 	//else if (ja_str == "ここにおいて") en_str = "put";
 
-	else if (std::string::npos != ja_str.find("青") || std::string::npos != ja_str.find("食器")) en_str = storageSpaceName4;
-
-	else if (std::string::npos != ja_str.find("茶") || std::string::npos != ja_str.find("棚")) en_str = storageSpaceName5;
-
+	else if (std::string::npos != ja_str.find("青") || std::string::npos != ja_str.find("食器")){
+		en_str = storageSpaceName4;
+		autoflag = false;
+	}
+	else if (std::string::npos != ja_str.find("茶") || std::string::npos != ja_str.find("棚")){
+		en_str = storageSpaceName5;
+		autoflag = false;
+	}
+	else if (std::string::npos != ja_str.find("かたづけ") || std::string::npos != ja_str.find("片づけ") || std::string::npos != ja_str.find("片付け")){
+		en_str = autoMode;
+		autoflag = true;
+	}
 	//捨てるor置く対象を間違った場合やり直す
 	else if (ja_str == "終わります") en_str = "finish";	
 
@@ -167,7 +191,7 @@ std::string VoiceRecognition::englishMessage2japaneseMessage(std::string english
 	}*/
 	else if (en_str == "please choose the trashbox")
 	{
-		ja_str = "持っていく先を教えてください";
+		ja_str = "指示を下サイ＾";
 	}
 	else if (en_str == "Clock") 
 	{
@@ -200,32 +224,62 @@ std::string VoiceRecognition::englishMessage2japaneseMessage(std::string english
 	else if (en_str == storageSpaceName0)
 	{
 		m_pointedtrash = storageSpaceName0;
-		ja_str = "分かりました、" + m_pointedObject + "を、" + "テーブル" + "、に置きに行きます";
+		if (autoflag == false){
+			ja_str = "分かりました、" + m_pointedObject + "を、" + "テーブル" + "、に置きに行きます";
+		}
+		else{
+			ja_str = m_pointedObject + "、が、一番運ばれた場所は、テーブルです。テーブルに持っていきます";
+		}
 	}
 	else if (en_str == storageSpaceName1)
 	{
 		m_pointedtrash = storageSpaceName1;
-		ja_str = "分かりました、" + m_pointedObject + "を、" + "キッチン" + "、に置きに行きます";
+		if (autoflag == false){
+			ja_str = "分かりました、" + m_pointedObject + "を、" + "キッチン" + "、に置きに行きます";
+		}
+		else{
+			ja_str = m_pointedObject + "、が、一番運ばれた場所は、キッチンです。キッチンに持っていきます";
+		}
 	}
 	else if (en_str == storageSpaceName2)
 	{
 		m_pointedtrash = storageSpaceName2;
-		ja_str = "分かりました、" + m_pointedObject + "を、" + "ワゴン" + "、に置きに行きます";
+		if (autoflag == false){
+			ja_str = "分かりました、" + m_pointedObject + "を、" + "ワゴン" + "、に置きに行きます";
+		}
+		else{
+			ja_str = m_pointedObject + "、が、一番運ばれた場所は、ワゴンです。ワゴンに持っていきます";
+		}
 	}
 	else if (en_str == storageSpaceName3)
 	{
 		m_pointedtrash = storageSpaceName3;
-		ja_str = "分かりました、" + m_pointedObject + "を、" + "本棚" + "、に置きに行きます";
+		if (autoflag == false){
+			ja_str = "分かりました、" + m_pointedObject + "を、" + "本棚" + "、に置きに行きます";
+		}
+		else{
+			ja_str = m_pointedObject + "、が、一番運ばれた場所は、本棚です。本棚に持っていきます";
+		}
 	}
 	else if (en_str == storageSpaceName4)
 	{
 		m_pointedtrash = storageSpaceName4;
-		ja_str = "分かりました、" + m_pointedObject + "を、" + "食器棚" + "、に置きに行きます";
+		if (autoflag == false){
+			ja_str = "分かりました、" + m_pointedObject + "を、" + "食器棚" + "、に置きに行きます";
+		}
+		else{
+			ja_str = m_pointedObject + "、が、一番運ばれた場所は、食器棚です。食器棚に持っていきます";
+		}
 	}
 	else if (en_str == storageSpaceName5)
 	{
 		m_pointedtrash = storageSpaceName5;
-		ja_str = "分かりました、" + m_pointedObject + "を、" + "棚" + "、に置きに行きます";
+		if (autoflag == false){
+			ja_str = "分かりました、" + m_pointedObject + "を、" + "棚" + "、に置きに行きます";
+		}
+		else{
+			ja_str = m_pointedObject + "、が、一番運ばれた場所は、棚です。棚に持っていきます";
+		}
 	}
 	return ja_str;
 }
@@ -249,6 +303,11 @@ void VoiceRecognition::onInit(){
 	storageSpaceName3 = "BookShelf";
 	storageSpaceName4 = "CupBoard";
 	storageSpaceName5 = "Shelf";
+
+	autoMode = "auto_mode";
+	selectMode = "select_mode";
+
+	autoflag = false;
 
 	ms.initialize();
 }

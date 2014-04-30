@@ -43,6 +43,7 @@ public:
 	bool findStorageSpace(std::string storageSpaceName);
 	void addStorageSpace(std::string storageSpaceName);
 	void incrementCleanUpCount();
+	std::string findBestStorageSpace();
 	
 	//対応表の中身を格納する変数
 	std::vector<cleanUpList> cul;
@@ -72,6 +73,15 @@ public:
 	//運び先を受信したか
 	bool receiveStorageSpace;
 
+	//最も運ばれた場所の名前
+	std::string maxStorageSpace;
+	//最も運ばれた回数
+	int maxCleanUpCount;
+
+	//自動で片付けるかどうか
+	std::string autoMode;	//自動で片付ける
+	std::string selectMode;	//片付け先を指定
+
 };
 
 MemorizeStorageSpace::~MemorizeStorageSpace()
@@ -93,6 +103,11 @@ void MemorizeStorageSpace::onInit(){
 
 	maxObjectNameLength = 0;
 	maxStorageSpaceNameLength = 0;
+
+	maxCleanUpCount = 0;
+
+	autoMode = "auto_mode";
+	selectMode = "select_mode";
 
 	readList();
 	
@@ -141,6 +156,9 @@ void MemorizeStorageSpace::onRecvMsg(sigverse::RecvMsgEvent &evt)
 			addStorageSpace(m_storageSpaceName);
 		}
 		receiveStorageSpace = true;
+	}
+	else if (msg == autoMode){
+		sendMsg(robotName, findBestStorageSpace());
 	}
 
 	printf("Message  : %s  \n", s.c_str());
@@ -212,7 +230,7 @@ void MemorizeStorageSpace::writeList()
 	std::ofstream ofs(listName.c_str(), std::ios::app);
 	for (int i = 0; i < cul.size(); i++){
 		ofs << cul[i].objectName;
-		//成型用
+		//リスト成型用
 		for (int num = 0; num < ( maxObjectNameLength - cul[i].objectName.length() ); num++){
 			ofs << " ";
 		}
@@ -222,7 +240,7 @@ void MemorizeStorageSpace::writeList()
 
 		for (int j = 0; j < cul[i].storageSpaceCount; j++){
 			ofs << cul[i].storageSpaceName[j];
-			//成型用
+			//リスト成型用
 			for (int num = 0; num < (maxStorageSpaceNameLength - cul[i].storageSpaceName[j].length()); num++){
 				ofs << " ";
 			}
@@ -322,6 +340,23 @@ void MemorizeStorageSpace::incrementCleanUpCount()
 	cul[objectIndex].cleanUpCount[storageSpaceIndex]++;
 	receiveObject = false;
 	receiveStorageSpace = false;
+}
+
+/*findBestStorageSpace
+	物体が運ばれた場所の中で一番回数が多い場所を返す
+	戻り値
+	　std::stirng：最も運ばれた場所の名前
+*/
+std::string MemorizeStorageSpace::findBestStorageSpace(){
+
+	for (int j = 0; j < cul[objectIndex].storageSpaceCount; j++){
+		if (maxCleanUpCount < cul[objectIndex].cleanUpCount[j]){
+			maxCleanUpCount = cul[objectIndex].cleanUpCount[j];
+			storageSpaceIndex = j;
+		}
+	}
+	maxCleanUpCount = 0;
+	return cul[objectIndex].storageSpaceName[storageSpaceIndex];
 }
 
 int main(int argc, char** argv)
