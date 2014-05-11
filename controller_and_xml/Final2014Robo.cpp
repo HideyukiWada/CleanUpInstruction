@@ -118,14 +118,13 @@ void DemoRobotController::onInit(InitEvent &evt) {
 	m_distance = 10.0;
 	/*RobotObj *m_robotObject = getRobotObj(myname());*/
 	m_robotObject->setWheel(m_radius, m_distance);
-
 	m_time = 0.0;
 	m_time1 = 0.0;
 	m_time4 = 0.0;
 	talk_time = 0.0;
 
 	//m_state = 0;
-	m_state = 100;  // switch of initial behavior
+	m_state = 50;  // switch of initial behavior
 	//m_state = 9140;
 
 
@@ -188,14 +187,33 @@ void DemoRobotController::onInit(InitEvent &evt) {
 	//storageSpaceName = storageSpaceName3;
 	//throwPosition = m_throwPosition3;
 	stopMargin = 0.0;
+
+	sendMsg("VoiceReco_Service", "Start_Reco");
 }
 
 
 double DemoRobotController::onAction(ActionEvent &evt) {
 	switch (m_state){
 	case 0: {
-				sendMsg("VoiceReco_Service", "Start_Reco");
 				break;
+	}
+	case 50: {
+				  if (evt.time() >= m_time){
+					  double l_moveTime = rotateTowardObj(m_userPosition);
+
+					  m_time = l_moveTime + evt.time();
+					  m_state = 55;
+					  LOG_MSG(("m_state:%d\n", m_state));
+				  }
+				  break;
+	}
+	case 55: {
+				  if (evt.time() >= m_time){
+					  this->stopRobotMove();
+					  m_state = 0;
+					  LOG_MSG(("m_state:%d\n", m_state));
+				  }
+				  break;
 	}
 	case 100: {
 				sendMsg("VoiceReco_Service", "Stop_Reco");

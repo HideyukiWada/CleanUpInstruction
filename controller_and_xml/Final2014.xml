@@ -32,10 +32,10 @@
     <set-attr-value name="scalex" value="0.74"/>
     <set-attr-value name="scaley" value="0.74"/>
     <set-attr-value name="scalez" value="0.74"/>
-    <set-attr-value name="qw" value="0.707"/>
-    <!--<set-attr-value name="qx" value="3"/>-->
+    <!--<set-attr-value name="qw" value="0.707"/>
+    --><!--<set-attr-value name="qx" value="3"/>--><!--
     <set-attr-value name="qy" value="0.707"/>
-    <!--<set-attr-value name="qz" value="2"/>-->
+    --><!--<set-attr-value name="qz" value="2"/>-->
     <set-attr-value name="collision" value="true"/>
 
     <!--stereo camera right--><!--
@@ -280,8 +280,9 @@
     <set-attr-value name="qy" value="0.707"/>
     <!--<set-attr-value name="qz" value="2"/>-->
     <set-attr-value name="collision" value="true"/>
+    <set-attr-value name="language" value="c++"/>
+    <set-attr-value name="implementation" value="./Table.so"/>
     <set-attr-value name="graspable" value="false"/>
-    <set-attr-value name="collision" value="true"/>
   </instanciate>
   <instanciate class="A1_fridge.xml">
     <set-attr-value name="name" value="Fridge1"/>
